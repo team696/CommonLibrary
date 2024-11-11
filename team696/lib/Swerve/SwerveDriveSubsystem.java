@@ -242,7 +242,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
             this.this0 = this0;
 
             this.setDaemon(true);
-            this.setPriority(1);
+            this.setPriority(MIN_PRIORITY);
         }
 
         public void run() {
@@ -282,7 +282,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
                 } finally {
                     this.this0._stateLock.writeLock().unlock();
                 }
-                Timer.delay(1.0 / 100.0);
+                //Timer.delay(1.0 / 100.0); //Limits To 100 Hz
             }
         }
     }
