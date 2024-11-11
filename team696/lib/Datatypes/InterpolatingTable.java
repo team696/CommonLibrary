@@ -1,10 +1,10 @@
-package team696.frc.lib.Datatypes;
+package frc.team696.lib.Datatypes;
 
 import java.util.Map;
 import java.util.TreeMap;
 
 import edu.wpi.first.math.interpolation.Interpolatable;
-import team696.frc.lib.Util;
+import frc.team696.lib.Util;
 
 public class InterpolatingTable<T extends Interpolatable<T>> {
     public final TreeMap<Double, T> map = new TreeMap<Double, T>();

@@ -1,4 +1,4 @@
-package team696.frc.lib.Swerve;
+package frc.team696.lib.Swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;

@@ -1,4 +1,4 @@
-package team696.frc.lib.Dashboards;
+package frc.team696.lib.Dashboards;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import team696.frc.lib.Logging.PLog;
+import frc.team696.lib.Logging.PLog;
 
 public class WebDashboard extends WebSocketServer {
 

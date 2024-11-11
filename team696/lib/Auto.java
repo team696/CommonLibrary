@@ -1,4 +1,4 @@
-package team696.frc.lib;
+package frc.team696.lib;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +21,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import team696.frc.lib.Dashboards.ShuffleDashboard;
-import team696.frc.lib.Logging.PLog;
-import team696.frc.lib.Swerve.SwerveConstants;
-import team696.frc.lib.Swerve.SwerveDriveSubsystem;
+import frc.team696.lib.Dashboards.ShuffleDashboard;
+import frc.team696.lib.Logging.PLog;
+import frc.team696.lib.Swerve.SwerveConstants;
+import frc.team696.lib.Swerve.SwerveDriveSubsystem;
 
 public class Auto {
     public static class NamedCommand {

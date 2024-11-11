@@ -1,4 +1,4 @@
-package team696.frc.lib.Camera;
+package frc.team696.lib.Camera;
 
 import java.util.Optional;
 
@@ -8,7 +8,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N3;
-import team696.frc.lib.Logging.PLog;
+import frc.team696.lib.Logging.PLog;
 
 public abstract class BaseCam {
     public class AprilTagResult {

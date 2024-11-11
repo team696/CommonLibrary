@@ -1,4 +1,4 @@
-package team696.frc.lib.Swerve;
+package frc.team696.lib.Swerve;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;

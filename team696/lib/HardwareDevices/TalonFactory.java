@@ -1,4 +1,4 @@
-package team696.frc.lib.HardwareDevices;
+package frc.team696.lib.HardwareDevices;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -10,7 +10,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.Timer;
-import team696.frc.lib.Logging.PLog;
+import frc.team696.lib.Logging.PLog;
 
 public class TalonFactory { 
     private final double TIMEOUT = 0.05;

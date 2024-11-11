@@ -1,4 +1,4 @@
-package team696.frc.lib.Swerve.Commands;
+package frc.team696.lib.Swerve.Commands;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -8,9 +8,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import team696.frc.lib.Util;
-import team696.frc.lib.Swerve.SwerveConstants;
-import team696.frc.lib.Swerve.SwerveDriveSubsystem;
+import frc.team696.lib.Util;
+import frc.team696.lib.Swerve.SwerveConstants;
+import frc.team696.lib.Swerve.SwerveDriveSubsystem;
 
 public class TeleopSwerve extends Command {
     protected static DoubleSupplier translation = ()->0;

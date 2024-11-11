@@ -1,4 +1,4 @@
-package team696.frc.lib.Camera;
+package frc.team696.lib.Camera;
 
 import java.util.Optional;
 

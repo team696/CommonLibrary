@@ -1,4 +1,4 @@
-package team696.frc.lib.HardwareDevices;
+package frc.team696.lib.HardwareDevices;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 

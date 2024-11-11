@@ -1,4 +1,4 @@
-package team696.frc.lib.HardwareDevices;
+package frc.team696.lib.HardwareDevices;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
@@ -9,7 +9,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
-import team696.frc.lib.Logging.PLog;
+import frc.team696.lib.Logging.PLog;
 
 public class PigeonFactory implements GyroInterface {
 

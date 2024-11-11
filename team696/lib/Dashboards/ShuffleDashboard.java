@@ -1,4 +1,4 @@
-package team696.frc.lib.Dashboards;
+package frc.team696.lib.Dashboards;
 
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;

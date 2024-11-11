@@ -1,4 +1,4 @@
-package team696.frc.lib.Swerve;
+package frc.team696.lib.Swerve;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -14,9 +14,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import team696.frc.lib.Util;
-import team696.frc.lib.HardwareDevices.CANCoderFactory;
-import team696.frc.lib.HardwareDevices.TalonFactory;
+import frc.team696.lib.Util;
+import frc.team696.lib.HardwareDevices.CANCoderFactory;
+import frc.team696.lib.HardwareDevices.TalonFactory;
 
 public class SwerveModule implements Sendable{
     public static int s_moduleCount = 0;

@@ -1,4 +1,4 @@
-package team696.frc.lib.HardwareDevices;
+package frc.team696.lib.HardwareDevices;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -7,7 +7,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
-import team696.frc.lib.Logging.PLog;
+import frc.team696.lib.Logging.PLog;
 
 public class CANCoderFactory {
     private final double TIMEOUT = 0.05;

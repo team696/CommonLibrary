@@ -1,4 +1,4 @@
-package team696.frc.lib.Dashboards;
+package frc.team696.lib.Dashboards;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,8 +11,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import team696.frc.lib.Logging.PLog;
-import team696.frc.robot.Robot;
+import frc.team696.lib.Logging.PLog;
+import frc.team696.robot.Robot;
 
 public class WebpageServer {
     public static final int PORT = 5806;

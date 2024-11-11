@@ -1,4 +1,4 @@
-package team696.frc.lib.Swerve;
+package frc.team696.lib.Swerve;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import team696.frc.lib.Util;
-import team696.frc.lib.HardwareDevices.PigeonFactory;
+import frc.team696.lib.Util;
+import frc.team696.lib.HardwareDevices.PigeonFactory;
 
 public abstract class SwerveDriveSubsystem extends SubsystemBase {
     private final SwerveModulePosition[] _swervePositions = new SwerveModulePosition[4];

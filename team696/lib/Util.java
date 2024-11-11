@@ -1,4 +1,4 @@
-package team696.frc.lib;
+package frc.team696.lib;
 
 import java.io.IOException;
 import java.net.NetworkInterface;
@@ -12,7 +12,7 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import team696.frc.lib.Logging.PLog;
+import frc.team696.lib.Logging.PLog;
 
 // Collection of Helpful Functions
 public class Util {
