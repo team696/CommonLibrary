@@ -258,6 +258,8 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
             _allSignals[_allSignals.length - 2] = this0._pigeon._yawSignal;
             _allSignals[_allSignals.length - 1] = this0._pigeon._yawVelocitySignal;
 
+            BaseStatusSignal.setUpdateFrequencyForAll(250, _allSignals);
+
             while (true) {
                 try {
                     BaseStatusSignal.refreshAll(_allSignals);
@@ -282,7 +284,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
                 } finally {
                     this.this0._stateLock.writeLock().unlock();
                 }
-                //Timer.delay(1.0 / 100.0); //Limits To 100 Hz
+                Timer.delay(1.0 / 1000.0); //Limits To 1000 Hz
             }
         }
     }
