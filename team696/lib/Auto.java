@@ -1,4 +1,4 @@
-package frc.team696.lib;
+package team696.frc.lib;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +17,19 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.team696.lib.Dashboards.ShuffleDashboard;
-import frc.team696.lib.Logging.PLog;
-import frc.team696.lib.Swerve.SwerveConstants;
-import frc.team696.lib.Swerve.SwerveDriveSubsystem;
+import team696.frc.lib.Dashboards.ShuffleDashboard;
+import team696.frc.lib.Logging.PLog;
+import team696.frc.lib.Swerve.SwerveConstants;
+import team696.frc.lib.Swerve.SwerveDriveSubsystem;
 
 public class Auto {
     public static class NamedCommand {
@@ -45,6 +50,8 @@ public class Auto {
     private SwerveDriveSubsystem _swerve;
 
     private final SendableChooser<Command> autoChooser;
+
+    private StringPublisher chooserChanger;
 
     private Auto (SwerveDriveSubsystem swerve, NamedCommand... commandsToRegister) {
         _swerve = swerve;
@@ -88,6 +95,10 @@ public class Auto {
         autoChooser = AutoBuilder.buildAutoChooser();
         ShuffleDashboard.addAutoChooser(autoChooser);
 
+        chooserChanger = NetworkTableInstance.getDefault().getStringTopic("Shuffleboard/Telemetry/Autos/selected").publish();
+
+        ShuffleDashboard.addObject("ChooseNearest (Doesn't Work)", Commands.runOnce(()->chooserChanger.accept(ClosestName())).ignoringDisable(true)).withPosition(7, 1).withSize(2,1);
+
         autoChooser.onChange((command)-> {
             visualize();
         });
@@ -105,14 +116,46 @@ public class Auto {
         return m_instance;
     }
 
-    public static Command Selected() {
-        if (m_instance == null) return new WaitCommand(0);
-
+    public Command Selected() {
         return m_instance.autoChooser.getSelected();
     }
 
-    public static Command SelectedEndAt15() {
+    public Command SelectedEndAt15() {
         return Selected().raceWith(new WaitCommand(15.0));
+    }
+
+    public String ClosestName() {
+        List<String> autoNames = AutoBuilder.getAllAutoNames();
+        double minDist = 4;
+        String closestName = "None";
+        for (int i = 0; i < autoNames.size(); i++) {
+            String autoName = autoNames.get(i);
+            try {
+                List<PathPlannerPath> poses = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
+                if (poses.size() == 0) continue;
+                Pose2d startingPose = poses.get(0).getPreviewStartingHolonomicPose();
+                Translation2d autoStartingPose = startingPose.getTranslation();
+                double dist = _swerve.getPose().getTranslation().getDistance(autoStartingPose);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestName = autoName;
+                }
+            } catch (Exception e) {
+                PLog.fatalException("Auto", autoName, e);
+            } 
+        }
+
+        return closestName;
+    }
+
+    public Command ClosestCommand() {
+        if (ClosestName().compareTo("None") == 0) return new WaitCommand(0);
+
+        return AutoBuilder.buildAuto(ClosestName());
+    }
+
+    public Command getNearestAutoCommand() {
+        return new ProxyCommand(()->ClosestCommand());
     }
 
     public static Command PathFind(Pose2d end) {
@@ -135,11 +178,11 @@ public class Auto {
         return AutoBuilder.pathfindToPose(initialPose, new PathConstraints(1, 1, Math.PI, Math.PI));
     }
 
-    public void visualize() {
+    public void visualize(String name) {
         List<PathPlannerPath> paths;
         List<Pose2d> pathPoses = new ArrayList<Pose2d>();
         try {
-            paths = PathPlannerAuto.getPathGroupFromAutoFile(autoChooser.getSelected().getName());
+            paths = PathPlannerAuto.getPathGroupFromAutoFile(name);
         } catch (Exception e) {
             PLog.fatalException("Auto", "Failed To Find Path", e);
             return;
@@ -151,5 +194,9 @@ public class Auto {
             pathPoses.addAll(path.getPathPoses());
         }
         ShuffleDashboard.field.getObject("traj").setPoses(pathPoses);
+    }
+
+    public void visualize() {
+        visualize(autoChooser.getSelected().getName());
     }
 }
