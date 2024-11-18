@@ -12,6 +12,11 @@ import frc.team696.lib.Util;
 import frc.team696.lib.Swerve.SwerveConstants;
 import frc.team696.lib.Swerve.SwerveDriveSubsystem;
 
+/**
+ * Swerve command for driving around during teleop
+ * 
+ * <p> Config once and create multiple objects to handle different driving styles
+ */
 public class TeleopSwerve extends Command {
     protected static DoubleSupplier translation = ()->0;
     protected static DoubleSupplier strafe = ()->0;

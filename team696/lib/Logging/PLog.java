@@ -2,7 +2,7 @@ package frc.team696.lib.Logging;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
-/** Add your docs here. */
+/** Class for printing out to the console */
 public class PLog {
     /**
 	 * Log a FATAL error, after which the robot cannot (properly) function. <br>

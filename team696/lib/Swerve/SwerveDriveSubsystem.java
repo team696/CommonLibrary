@@ -77,6 +77,12 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         _odometryThread.start();
     }
 
+    /**
+     * 
+     * @return Current Estimated State Of The Robot
+     * 
+     * @see SwerveDriveState.java
+     */
     public SwerveDriveState getState() {
         try {
            this._stateLock.readLock().lock();
@@ -86,10 +92,19 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * 
+     * @return Current Estimated Pose2d Of The Robot
+     */
     public Pose2d getPose() {
         return getState().pose;
     }
 
+    /**
+     *  Resets The Pose2d Of The Robot To newPose
+     * 
+     * @param newPose new Pose2d Of The Robot
+     */
     public void resetPose(Pose2d newPose) {
         try {
             this._stateLock.writeLock().lock();
@@ -99,34 +114,72 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Resets The Pose Of the Robot to 0,0,0
+     */
     public void resetPose() {
         resetPose(new Pose2d());
     }
 
+    /**
+     * Updated The Yaw Offset Of The Robot
+     * <p>
+     *  Used To 0 out the Gyro When Driving
+     */
     public void updateYawOffset() {
         yawOffset = getPose().getRotation().minus(getYaw());
     }
 
-    // Called periodically -> 50 Hz
+    /**
+     * Periodically called 50 Hz
+     * <p>
+     *  Replaces the regular periodic function
+     */
     public abstract void onUpdate();
 
+    /**
+     * 
+     * @return Current Yaw Of the Gyro
+     * 
+     * @see latencyAdjustedYaw()
+     */
     public Rotation2d getYaw() {
         return _pigeon.getYaw();
     }
 
+    /**
+     * 
+     * @return Latency Adjusted Yaw Of the Gyro
+     */
     public Rotation2d latencyAdjustedYaw() {
         return _pigeon.getLatencyAdjustedYaw();
     }
 
+    /**
+     * Zeros the gyro
+     */
     public void zeroYaw() {
         yawOffset = getYaw();
         resetPose(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(Util.getAlliance() == DriverStation.Alliance.Red ? 180 : 0) ));
     }
 
+    /**
+     * 
+     * @return Robot Relatives Speeds
+     * 
+     * <ul>
+     *  <li> x is forward </li>
+     *  <li> y is left </li>
+     *  <li> r is counterclock wise </li>
+     */
     public ChassisSpeeds getRobotRelativeSpeeds() {
         return getState().robotRelativeSpeeds;
     }
 
+    /**
+     * 
+     * @return Array Of Modules States
+     */
     protected SwerveModuleState[] getModuleStates() { 
         SwerveModuleState[] states = new SwerveModuleState[4]; 
         for(SwerveModule mod : _modules) { 
@@ -135,6 +188,10 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         return states; 
     }
 
+    /**
+     * 
+     * @return Array of Module Positions 
+     */
     protected SwerveModulePosition[] getModulePositions() { 
         SwerveModulePosition[] states = new SwerveModulePosition[4]; 
         for(SwerveModule mod : _modules) { 
@@ -143,6 +200,14 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         return states; 
     }
 
+    /**
+     * Used To drive the robot during teleop
+     * 
+     * @param translation in X, Y
+     * @param rotation in R
+     * @param fieldRelative should forward be based on the field or robot
+     * @param isOpenLoop closed or open loop control of the drive wheels. Typically openLoop for teleop and closed for autonomous
+     */
     public void Drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         SwerveModuleState[] swerveModuleStates =
             _kinematics.toSwerveModuleStates(
@@ -159,15 +224,27 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         setModuleStates(swerveModuleStates, isOpenLoop);
     }
 
+    /**
+     * Used to drive during auto
+     * 
+     * @param c Chassis Speeds object containing the desired speeds of the robot
+     */
     public void Drive(ChassisSpeeds c) {
         SwerveModuleState[] swerveModuleStates = _kinematics.toSwerveModuleStates(c);
         setModuleStates(swerveModuleStates);
     } 
 
+    /**
+     * Stops driving
+     */
     public void doNothing() {
         Drive(new ChassisSpeeds());
     }
     
+    /**
+     * @param desiredStates the desired states of each module, in the order of the kinematics (FL, FR, BL, BR)
+     * @param openLoop Open or closed loop control
+     */
     public void setModuleStates(SwerveModuleState[] desiredStates, boolean openLoop) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.maxSpeed);
         
@@ -177,34 +254,63 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         this.swerveModuleDesiredStates = desiredStates;
     } 
     
+    /**
+     * Using closed loop control
+     * 
+     * @param desiredStates the desired states of each module, in the order of the kinematics (FL, FR, BL, BR)
+     */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         setModuleStates(desiredStates, false);
     } 
 
+    /**
+     * 
+     * @return List Of Swerve Modules
+     */
     public SwerveModule[] getModules() {
         return _modules;
     }
 
+    /**
+     * 
+     * @param position Position for distance from
+     * @return distance from position argument
+     */
     public double distTo(Translation2d position) {
         return getPose().getTranslation().getDistance(position);
     }
 
+    /**
+     * 
+     * @param position Position for distance from
+     * @return distance from position argument
+     */
     public double distTo(Pose2d position) {
         return distTo(position.getTranslation());
     }
 
+    /**
+     * 
+     * @param position Position for angle to
+     * @return Angle to Position
+     */
     public Rotation2d angleTo(Translation2d position) {
         Translation2d delta = getPose().getTranslation().minus(position);
         Rotation2d rot = Rotation2d.fromRadians(Math.atan2(delta.getY(), delta.getX()));
         return rot;
     }
 
+    /**
+     * 
+     * @param position Position for angle to
+     * @return Angle to Position
+     */
     public Rotation2d angleTo(Pose2d position) {
         return angleTo(position.getTranslation());
     }
 
 
-    /*
+    /**
      * Don't override periodic, override onUpdate()
      * 
      */
@@ -223,6 +329,13 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         onUpdate();
     }
 
+    /**
+     * Adds a vision measurement to the current estimation
+     * 
+     * @param visionPose Vision Pose
+     * @param visionTimestamp Vision Timestamp
+     * @param stdDeviations Standard Deviations of vision measurement
+     */
     public void addVisionMeasurement(Pose2d visionPose, double visionTimestamp, Vector<N3> stdDeviations) {
         try {
             this._stateLock.writeLock().lock();

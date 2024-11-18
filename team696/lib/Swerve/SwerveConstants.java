@@ -3,6 +3,11 @@ package frc.team696.lib.Swerve;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
+/**
+ * Constants of the Swerve Drive
+ * 
+ * <p> Should Be Updated For Each Robot Accordingly
+ */
 public class SwerveConstants {
 		public static final String canBus = "rio";
 

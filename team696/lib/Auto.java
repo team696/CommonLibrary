@@ -30,12 +30,21 @@ import team696.frc.lib.Dashboards.ShuffleDashboard;
 import team696.frc.lib.Logging.PLog;
 import team696.frc.lib.Swerve.SwerveConstants;
 import team696.frc.lib.Swerve.SwerveDriveSubsystem;
-
+/**
+ * Houses all methods related to the Autonomous period and self driving during teleop
+ */
 public class Auto {
+    /**
+     * Wrapper For Pathplanners NamedCommand System
+     */
     public static class NamedCommand {
         public String name;
         public Command command;
 
+        /**
+         * @param name to be used inside of the pathplanner GUI
+         * @param command to be run when called inside pathplanner
+         */
         public NamedCommand(String name, Command command) {
             this.name = name;
             this.command = command;
@@ -104,29 +113,45 @@ public class Auto {
         });
     }
 
+    /**
+     * Initializes all things related to auto (ex. pathplanner)
+     * 
+     * @param swerve The swerve subsystem
+     * @param commandsToRegister each command to register for path planner
+     */
     public static void Initialize(SwerveDriveSubsystem swerve, NamedCommand... commandsToRegister){
         if (m_instance != null) throw new RuntimeException ("Don't Initialize Twice!");
         
         m_instance = new Auto(swerve, commandsToRegister);
     }
 
+    /**
+     * @return The instance Of the Auto Class
+     */
     public static Auto get(){
         if (m_instance == null) throw new RuntimeException ("Please Initialize First!");
 
         return m_instance;
     }
 
+    /**
+     * @return Selected Command From SendableChooser
+     */
     public Command Selected() {
         return m_instance.autoChooser.getSelected();
     }
 
+    /**
+     * @return Selected Command From SendableChooser Which Will End After 15 Seconds.
+     *              Used for testing on home field
+     */
     public Command SelectedEndAt15() {
         return Selected().raceWith(new WaitCommand(15.0));
     }
 
     public String ClosestName() {
         List<String> autoNames = AutoBuilder.getAllAutoNames();
-        double minDist = 4;
+        double minDist = 100;
         String closestName = "None";
         for (int i = 0; i < autoNames.size(); i++) {
             String autoName = autoNames.get(i);
@@ -136,6 +161,7 @@ public class Auto {
                 Pose2d startingPose = poses.get(0).getPreviewStartingHolonomicPose();
                 Translation2d autoStartingPose = startingPose.getTranslation();
                 double dist = _swerve.getPose().getTranslation().getDistance(autoStartingPose);
+                PLog.info("Test", dist);
                 if (dist < minDist) {
                     minDist = dist;
                     closestName = autoName;

@@ -14,12 +14,29 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.team696.lib.Logging.PLog;
 
-// Collection of Helpful Functions
+/**
+ *  Useful functions which don't fit anywhere specific
+ */
 public class Util {
+
+    /**
+     * Linear Interpolates between two numbers
+     * 
+     * @param t Value from [0,1]
+     * @param min Lower value --> 0
+     * @param max Upper value --> 1
+     * @return Interpolated value between min and max
+     */
     public static double lerp(double t, double min, double max) {
         return (max - min) * t + min;
     }
 
+    /**
+     * @param val Value to be clamped
+     * @param min Minimum Value
+     * @param max Maximum Value
+     * @return Value Clamped between min and max
+     */
     public static double clamp(double val, double min, double max) {
         return Math.max(Math.min(max, val), min);
     }
@@ -28,6 +45,9 @@ public class Util {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
+    /**
+     * @return Current Alliance through driverstation or FMS. Defaults to Blue.
+     */
     public static Alliance getAlliance() {
         if (DriverStation.getAlliance().isPresent()) {
             return DriverStation.getAlliance().get();
@@ -76,6 +96,11 @@ public class Util {
         return wheelRotations;
     }
 
+    /**
+     * 
+     * @return List of connected MAC Addresses
+     * @throws IOException
+     */
     public static List<byte[]> getMacAddresses() throws IOException {
 		List<byte[]> macAddresses = new ArrayList<>();
 
@@ -105,16 +130,18 @@ public class Util {
 		return builder.toString();
 	}
 
-    /* Returns the current detected robot based on map of robot name to mac address
-     * 
-     * -1 is simulation
-     *  0 is unknown
-     *  1 is first item in map... etc.
-     * 
+    /** Returns the current detected robot based on map of robot name to mac address
+     * <p>
+     *  <ul>
+     *  <li> -1 is simulation </li>
+     *  <li> 0 is unknown </li>
+     *  <li> 1 is first item in map... etc. </li>
+     *  </ul>
+     * </p>
      *  verbose will print to console, which robot connected, or the MAC if unknown
      * 
-     *  ex (RobotInit()):  Util.setRobotType(new LinkedHashMap<>() { }, true);
-
+     * <p>
+     *  ex: (RobotInit()):  Util.setRobotType(new LinkedHashMap<>() { }, true);
      */
     public static int setRobotType(LinkedHashMap<String, byte[]> nameToMac, boolean verbose) {
         if (RobotBase.isSimulation()) {

@@ -9,6 +9,12 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+/**
+ * 
+ * Device Configs of the Swerve Drive
+ * 
+ * <p> Only Update Device Configs if you know what you are doing.
+ */
 public final class SwerveConfigs {
         public final static TalonFXConfiguration angle;
         public final static TalonFXConfiguration drive;

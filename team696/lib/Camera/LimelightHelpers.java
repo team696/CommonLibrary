@@ -30,6 +30,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Default Library Supplied By LimeLight Themselves
+ * 
+ * <p> Potentially will be removed in the future.
+ */
 @SuppressWarnings("unused")
 public class LimelightHelpers {
 

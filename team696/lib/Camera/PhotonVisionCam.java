@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.net.PortForwarder;
 import frc.team696.lib.Logging.PLog;
 
+/** PhotonVision Camera Interface */
 public class PhotonVisionCam extends BaseCam {
 
     public String _name;

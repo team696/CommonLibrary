@@ -8,9 +8,9 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 
-/* Maybe in future remove limelightHelpers Dependency,
-    really just copy pasting but I'm lazy */
-
+/**
+ * LimeLight Camera Interface
+ */
 public class LimeLightCam extends BaseCam {
     public String name = "";
     public static int LimeLightCount = 0;

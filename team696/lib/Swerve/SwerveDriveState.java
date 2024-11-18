@@ -11,7 +11,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-/** Add your docs here. */
+/** 
+ * Holds the current State of the robot and last update.
+ * 
+ * <p> Should Not be manually updated
+ */
 public class SwerveDriveState {
     public Pose2d pose;
     public ChassisSpeeds robotRelativeSpeeds;
@@ -33,14 +37,30 @@ public class SwerveDriveState {
         this(new Pose2d(), new ChassisSpeeds(), 0);
     }
 
+    /**
+     * 
+     * @return Current X,Y velocity of the robot
+     */
     public double velocity() {
         return Math.sqrt(robotRelativeSpeeds.vxMetersPerSecond * robotRelativeSpeeds.vxMetersPerSecond + robotRelativeSpeeds.vyMetersPerSecond * robotRelativeSpeeds.vyMetersPerSecond);
     }
 
+    /**
+     * 
+     * @return Current Rotational Velocity of the robot
+     */
     public double angularVelocity() {
         return Math.abs(robotRelativeSpeeds.omegaRadiansPerSecond);
     }
 
+    /**
+     * Used interally for updated estimation
+     * 
+     * @param pose
+     * @param speeds
+     * @param time
+     * @return
+     */
     public SwerveDriveState update(Pose2d pose, ChassisSpeeds speeds, double time) {
         this.timeSinceLastUpdate = time - this.timeStamp;
 
@@ -51,6 +71,9 @@ public class SwerveDriveState {
         return this;
     }
 
+    /**
+     * Logs the state of the robot 
+     */
     public void publish() {
         Logger.recordOutput("Pose", this.pose);
         Logger.recordOutput("Speeds", this.robotRelativeSpeeds);

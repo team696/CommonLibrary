@@ -12,6 +12,13 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team696.lib.Logging.PLog;
 
+/**
+ * Class For creating and keeping track of talon device 
+ * 
+ * <p> Automatically logs name of the device if it fails to config
+ * 
+ * <p> Resets device parameters if it drops out
+ */
 public class TalonFactory { 
     private final double TIMEOUT = 0.05;
     private TalonFX _motor;

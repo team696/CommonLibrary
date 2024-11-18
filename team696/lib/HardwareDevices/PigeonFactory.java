@@ -11,6 +11,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team696.lib.Logging.PLog;
 
+/**
+ * Automatically configures and optimizes pigeon
+ */
 public class PigeonFactory implements GyroInterface {
 
     private final double TIMEOUT = 0.05;

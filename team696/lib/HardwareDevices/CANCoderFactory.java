@@ -9,6 +9,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team696.lib.Logging.PLog;
 
+/**
+ * Class For creating and keeping track of cancoder device 
+ * 
+ * <p> Automatically logs name of the device if it fails to config
+ * 
+ * <p> Resets device parameters if it drops out
+ */
 public class CANCoderFactory {
     private final double TIMEOUT = 0.05;
     private CANcoder _encoder;

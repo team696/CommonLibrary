@@ -10,6 +10,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N3;
 import frc.team696.lib.Logging.PLog;
 
+/** Base Camera Object for handling how cameras will generally be handled
+ * 
+ * <p> Extend to add functionality for a specific camera
+ * @see LimeLightCam.java
+ * @see PhotonVisionCam.java
+ */
 public abstract class BaseCam {
     public class AprilTagResult {
         public Pose2d pose;
