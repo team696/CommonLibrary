@@ -1,4 +1,4 @@
-package team696.frc.lib;
+package frc.team696.lib;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +9,12 @@ import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -24,12 +24,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import team696.frc.lib.Dashboards.ShuffleDashboard;
-import team696.frc.lib.Logging.PLog;
-import team696.frc.lib.Swerve.SwerveConstants;
-import team696.frc.lib.Swerve.SwerveDriveSubsystem;
+import frc.team696.lib.Dashboards.ShuffleDashboard;
+import frc.team696.lib.Logging.PLog;
+import frc.team696.lib.Swerve.SwerveDriveSubsystem;
+
 /**
  * Houses all methods related to the Autonomous period and self driving during teleop
  */
@@ -58,27 +57,31 @@ public class Auto {
     public static Auto m_instance;
     private SwerveDriveSubsystem _swerve;
 
-    private final SendableChooser<Command> autoChooser;
+    private SendableChooser<Command> autoChooser;
 
     private StringPublisher chooserChanger;
 
     private Auto (SwerveDriveSubsystem swerve, NamedCommand... commandsToRegister) {
         _swerve = swerve;
         
-        final HolonomicPathFollowerConfig FollowConfig = new HolonomicPathFollowerConfig(
-            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
-            SwerveConstants.maxSpeed, // Max module speed, in m/s
-            SwerveConstants.driveBaseRadM, // Drive base radius in meters. Distance from robot center to furthest module.
-            new ReplanningConfig() // Default path replanning config. See the API for the options here
-        );
+        RobotConfig config;
+        try{
+            config = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            // Handle exception as needed
+            PLog.fatalException("Auto", "Failed To Get RobotConfig", e); 
+            return;
+        }
 
-        AutoBuilder.configureHolonomic(
+        AutoBuilder.configure(
             _swerve::getPose, 
             _swerve::resetPose, 
             _swerve::getRobotRelativeSpeeds,
-            _swerve::Drive, 
-            FollowConfig,
+            (speeds, feedforwards) -> _swerve.Drive(speeds), 
+            new PPHolonomicDriveController(  
+                    new PIDConstants(5.0, 0.0, 0.0), 
+                    new PIDConstants(5.0, 0.0, 0.0)),
+            config,
             () -> {
                 Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
                 if (alliance.isPresent()) {
@@ -158,7 +161,7 @@ public class Auto {
             try {
                 List<PathPlannerPath> poses = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
                 if (poses.size() == 0) continue;
-                Pose2d startingPose = poses.get(0).getPreviewStartingHolonomicPose();
+                Pose2d startingPose = poses.get(0).getStartingDifferentialPose();
                 Translation2d autoStartingPose = startingPose.getTranslation();
                 double dist = _swerve.getPose().getTranslation().getDistance(autoStartingPose);
                 PLog.info("Test", dist);
@@ -180,10 +183,6 @@ public class Auto {
         return AutoBuilder.buildAuto(ClosestName());
     }
 
-    public Command getNearestAutoCommand() {
-        return new ProxyCommand(()->ClosestCommand());
-    }
-
     public static Command PathFind(Pose2d end) {
         return AutoBuilder.pathfindToPose(end, new PathConstraints(1, 1, Math.PI,Math.PI));
     }
@@ -195,7 +194,7 @@ public class Auto {
 
             if (paths.size() <= 0) return new WaitCommand(0);
 
-            initialPose = paths.get(0).getPreviewStartingHolonomicPose();
+            initialPose = paths.get(0).getStartingDifferentialPose();
         } catch (Exception e) {
             PLog.fatalException("Auto", "Failed To Find Path", e);
             return new WaitCommand(0);

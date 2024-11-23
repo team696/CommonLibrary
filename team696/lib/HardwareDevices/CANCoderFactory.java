@@ -6,7 +6,10 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.team696.lib.Logging.PLog;
 
 /**
@@ -58,13 +61,16 @@ public class CANCoderFactory {
             _configured = true;
         }
 
+        if (!_configured)
+            Shuffleboard.addEventMarker(String.format("Failed to configure %s", this._name), EventImportance.kCritical);
+
         return _configured;
     }
 
 
     public Rotation2d getPosition() {
         if (configure()) {
-            StatusSignal<Double> positionCode = _encoder.getAbsolutePosition();
+            StatusSignal<Angle> positionCode = _encoder.getAbsolutePosition();
             if(!positionCode.getStatus().isOK()) {
                 _configured = false;
                 return new Rotation2d();

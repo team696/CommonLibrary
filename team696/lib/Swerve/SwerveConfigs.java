@@ -3,11 +3,11 @@ package frc.team696.lib.Swerve;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 
 /**
  * 
@@ -46,8 +46,8 @@ public final class SwerveConfigs {
                 angle.ClosedLoopGeneral.ContinuousWrap = true;
                 angle.CurrentLimits.SupplyCurrentLimitEnable = true;
                 angle.CurrentLimits.SupplyCurrentLimit = 25;
-                angle.CurrentLimits.SupplyCurrentThreshold = 40;
-                angle.CurrentLimits.SupplyTimeThreshold = 0.1;
+                angle.CurrentLimits.SupplyCurrentLowerLimit = 40;
+                angle.CurrentLimits.SupplyCurrentLowerTime = 0.1;
                 angle.CurrentLimits.StatorCurrentLimitEnable = true;
                 angle.CurrentLimits.StatorCurrentLimit = 40;
                 angle.Slot0.kP = 175.0;
@@ -66,8 +66,8 @@ public final class SwerveConfigs {
                 drive.Feedback.SensorToMechanismRatio = SwerveConstants.driveGearRatio;
                 drive.CurrentLimits.SupplyCurrentLimitEnable = true;
                 drive.CurrentLimits.SupplyCurrentLimit = 25;
-                drive.CurrentLimits.SupplyCurrentThreshold = 60;
-                drive.CurrentLimits.SupplyTimeThreshold = 0.2;
+                drive.CurrentLimits.SupplyCurrentLowerLimit = 60;
+                drive.CurrentLimits.SupplyCurrentLowerTime = 0.2;
                 drive.CurrentLimits.StatorCurrentLimitEnable = true;
                 drive.CurrentLimits.StatorCurrentLimit = 60;
 

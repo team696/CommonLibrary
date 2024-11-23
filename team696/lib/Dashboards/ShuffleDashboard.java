@@ -15,6 +15,7 @@ public class ShuffleDashboard {
         _mainTab = Shuffleboard.getTab("Telemetry");
 
         _mainTab.add(field).withPosition(0, 0).withSize(7, 6);
+        
     }
 
     public static ComplexWidget addObject(Sendable object) {

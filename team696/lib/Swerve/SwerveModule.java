@@ -5,12 +5,15 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.ParentDevice;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,11 +24,11 @@ import frc.team696.lib.HardwareDevices.TalonFactory;
 public class SwerveModule implements Sendable{
     public static int s_moduleCount = 0;
 
-    private final StatusSignal<Double> _encoderSignal;
-    private final StatusSignal<Double> _anglePositionSignal;
-    private final StatusSignal<Double> _angleVelocitySignal;
-    private final StatusSignal<Double> _drivePositionSignal;
-    private final StatusSignal<Double> _driveVelocitySignal;
+    private final StatusSignal<Angle> _encoderSignal;
+    private final StatusSignal<Angle> _anglePositionSignal;
+    private final StatusSignal<AngularVelocity> _angleVelocitySignal;
+    private final StatusSignal<Angle> _drivePositionSignal;
+    private final StatusSignal<AngularVelocity> _driveVelocitySignal;
 
     public static final int SIGNAL_COUNT = 4; 
 
@@ -70,9 +73,10 @@ public class SwerveModule implements Sendable{
 
         _lastAngle = getState().angle.getRotations();
     }
-
+    
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop){
-        desiredState = SwerveModuleState.optimize(desiredState, getState().angle); 
+        desiredState.optimize(getState().angle);
+        desiredState.cosineScale(getState().angle); 
         double angle = ((Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.maxSpeed * 0.01)) ? _lastAngle : desiredState.angle.getRotations());
         _angleMotor.setControl(_anglePosition.withPosition(angle));
         setSpeed(desiredState, isOpenLoop);
@@ -80,12 +84,11 @@ public class SwerveModule implements Sendable{
     }
 
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
-        double ratio = Math.cos(desiredState.angle.getRadians() - getState().angle.getRadians()); 
         if(isOpenLoop){
-            _driveMotor.VoltageOut(desiredState.speedMetersPerSecond / SwerveConstants.maxSpeed * ratio);
+            _driveMotor.VoltageOut(desiredState.speedMetersPerSecond / SwerveConstants.maxSpeed);
         } else {
-            _driveVelocity.Velocity = Util.MPSToRPS(desiredState.speedMetersPerSecond * ratio, SwerveConstants.wheelCircumference);
-            _driveVelocity.FeedForward = _driveFeedForward.calculate(desiredState.speedMetersPerSecond);
+            _driveVelocity.Velocity = Util.MPSToRPS(desiredState.speedMetersPerSecond, SwerveConstants.wheelCircumference);
+            _driveVelocity.FeedForward = _driveFeedForward.calculate(Units.MetersPerSecond.of(desiredState.speedMetersPerSecond)).magnitude();
             _driveMotor.setControl(_driveVelocity);
         }
     }
@@ -133,7 +136,7 @@ public class SwerveModule implements Sendable{
             _drivePositionSignal.refresh();
             _driveVelocitySignal.refresh();
         }
-        return BaseStatusSignal.getLatencyCompensatedValue(_drivePositionSignal, _driveVelocitySignal);
+        return BaseStatusSignal.getLatencyCompensatedValue(_drivePositionSignal, _driveVelocitySignal).magnitude();
     }
 
     public double getDriveMotorPosition() {
@@ -145,7 +148,7 @@ public class SwerveModule implements Sendable{
             _anglePositionSignal.refresh();
             _angleVelocitySignal.refresh();
         }
-        return BaseStatusSignal.getLatencyCompensatedValue(_anglePositionSignal, _angleVelocitySignal);
+        return BaseStatusSignal.getLatencyCompensatedValue(_anglePositionSignal, _angleVelocitySignal).magnitude();
     }
 
     public double getAngleMotorPosition() {

@@ -209,18 +209,13 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
      * @param isOpenLoop closed or open loop control of the drive wheels. Typically openLoop for teleop and closed for autonomous
      */
     public void Drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] swerveModuleStates =
-            _kinematics.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                                translation.getX(), 
-                                translation.getY(), 
-                                rotation, 
-                                getYaw().plus(yawOffset).rotateBy(Rotation2d.fromDegrees( (Util.getAlliance() == Alliance.Red ? 180 : 0) )) 
-                            ) : new ChassisSpeeds(
-                                translation.getX(), 
-                                translation.getY(), 
-                                rotation));
-                               
+        ChassisSpeeds desiredRobotSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation) ;
+        
+        if (fieldRelative)
+            desiredRobotSpeeds.toFieldRelativeSpeeds(getYaw().plus(yawOffset).rotateBy(Rotation2d.fromDegrees( (Util.getAlliance() == Alliance.Red ? 180 : 0) )));
+
+        SwerveModuleState[] swerveModuleStates = _kinematics.toSwerveModuleStates(desiredRobotSpeeds);
+                        
         setModuleStates(swerveModuleStates, isOpenLoop);
     }
 

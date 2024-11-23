@@ -9,7 +9,12 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.team696.lib.Logging.PLog;
 
 /**
@@ -73,6 +78,9 @@ public class TalonFactory {
             _configured = true;
         }
 
+        if (!_configured)
+            Shuffleboard.addEventMarker(String.format("Failed to configure %s", this._name), EventImportance.kCritical);
+
         return _configured;
     }
 
@@ -109,7 +117,7 @@ public class TalonFactory {
 
     public double getPosition() {
         if (configure()) {
-            StatusSignal<Double> positionCode = _motor.getPosition();
+            StatusSignal<Angle> positionCode = _motor.getPosition();
             if(!positionCode.getStatus().isOK()) {
                 _configured = false;
                 return 0;
@@ -121,7 +129,7 @@ public class TalonFactory {
 
     public double getVelocity() {
         if (configure()) {
-            StatusSignal<Double> velocityCode = _motor.getVelocity();
+            StatusSignal<AngularVelocity> velocityCode = _motor.getVelocity();
             if(!velocityCode.getStatus().isOK()) {
                 _configured = false;
                 return 0;
@@ -154,7 +162,7 @@ public class TalonFactory {
 
     public double getCurrent() {
         if (configure()) {
-            StatusSignal<Double> currentCode = _motor.getStatorCurrent();
+            StatusSignal<Current> currentCode = _motor.getStatorCurrent();
             if(!currentCode.getStatus().isOK()) {
                 _configured = false;
                 return 0;

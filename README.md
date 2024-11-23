@@ -14,3 +14,8 @@
     Advantage Kit,
     Photonvision 
         - To Remove Just Delete team696/lib/Camera/PhotonVisionCam.java file
+
+# Other Useful Information
+    Build.gradle
+        Change DeleteOldFiles to true
+        
