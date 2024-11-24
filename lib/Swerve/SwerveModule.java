@@ -33,13 +33,13 @@ public class SwerveModule implements Sendable{
     public static final int SIGNAL_COUNT = 4; 
 
     public int moduleNumber;
-    private double _angleOffset;
+    private Rotation2d _angleOffset;
     
     private TalonFactory _angleMotor;
     private TalonFactory _driveMotor;
     private CANCoderFactory _encoder;
 
-    private double _lastAngle;
+    private Rotation2d _lastAngle;
 
     private final SimpleMotorFeedforward _driveFeedForward = new SimpleMotorFeedforward(SwerveConstants.drivekS, SwerveConstants.drivekV, SwerveConstants.drivekA);
     
@@ -49,7 +49,7 @@ public class SwerveModule implements Sendable{
 
     public SwerveModule(SwerveModuleConstants moduleConstants){
         this.moduleNumber = s_moduleCount++;
-        this._angleOffset = moduleConstants.CANcoderOffset; 
+        this._angleOffset = Rotation2d.fromRotations(moduleConstants.CANcoderOffset); 
         /* Angle Encoder Config */
         _encoder = new CANCoderFactory(moduleConstants.CANcoderId, SwerveConstants.canBus, SwerveConfigs.canCoder, "Swerve Encoder " + moduleNumber);
 
@@ -71,23 +71,23 @@ public class SwerveModule implements Sendable{
 
         ParentDevice.optimizeBusUtilizationForAll(_encoder.get(), _angleMotor.get(), _driveMotor.get());
 
-        _lastAngle = getState().angle.getRotations();
+        _lastAngle = getState().angle;
     }
     
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop){
         desiredState.optimize(getState().angle);
         desiredState.cosineScale(getState().angle); 
-        double angle = ((Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.maxSpeed * 0.01)) ? _lastAngle : desiredState.angle.getRotations());
-        _angleMotor.setControl(_anglePosition.withPosition(angle));
+        Rotation2d angle = ((Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_VELOCITY.in(Units.MetersPerSecond) * 0.01)) ? _lastAngle : desiredState.angle);
+        _angleMotor.setControl(_anglePosition.withPosition(angle.getRotations()));
         setSpeed(desiredState, isOpenLoop);
         _lastAngle = angle;
     }
 
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
         if(isOpenLoop){
-            _driveMotor.VoltageOut(desiredState.speedMetersPerSecond / SwerveConstants.maxSpeed);
+            _driveMotor.VoltageOut(desiredState.speedMetersPerSecond / SwerveConstants.MAX_VELOCITY.in(Units.MetersPerSecond));
         } else {
-            _driveVelocity.Velocity = Util.MPSToRPS(desiredState.speedMetersPerSecond, SwerveConstants.wheelCircumference);
+            _driveVelocity.Velocity = Util.MPSToRPS(desiredState.speedMetersPerSecond, SwerveConstants.WHEEL_CIRCUM.in(Units.Meters));
             _driveVelocity.FeedForward = _driveFeedForward.calculate(Units.MetersPerSecond.of(desiredState.speedMetersPerSecond)).magnitude();
             _driveMotor.setControl(_driveVelocity);
         }
@@ -106,8 +106,8 @@ public class SwerveModule implements Sendable{
     }
 
     public void resetToAbsolute(){
-        double absolutePosition = getCANCoderAngle(true).getRotations() - _angleOffset;
-        _angleMotor.setPosition(absolutePosition);
+        Rotation2d absolutePosition = getCANCoderAngle(true).minus(_angleOffset);
+        _angleMotor.setPosition(absolutePosition.getRotations());
     }
 
     public SwerveModuleState getState(boolean refresh){
@@ -115,7 +115,7 @@ public class SwerveModule implements Sendable{
             _driveVelocitySignal.refresh();
         }
         return new SwerveModuleState(
-            Util.RPSToMPS(_driveVelocitySignal.getValueAsDouble(), SwerveConstants.wheelCircumference), 
+            Util.RPSToMPS(_driveVelocitySignal.getValueAsDouble(), SwerveConstants.WHEEL_CIRCUM.in(Units.Meters)), 
             Rotation2d.fromRotations(getAngleMotorPosition(refresh))
         );
     }
@@ -126,7 +126,7 @@ public class SwerveModule implements Sendable{
 
     public SwerveModulePosition getPosition(){
         return new SwerveModulePosition(
-            Util.rotationsToMeters(getDriveMotorPosition(), SwerveConstants.wheelCircumference), 
+            Util.rotationsToMeters(getDriveMotorPosition(), SwerveConstants.WHEEL_CIRCUM.in(Units.Meters)), 
             Rotation2d.fromRotations(getAngleMotorPosition())
         );
     }

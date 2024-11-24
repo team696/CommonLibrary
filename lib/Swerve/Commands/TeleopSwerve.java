@@ -1,5 +1,8 @@
 package frc.team696.lib.Swerve.Commands;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -78,8 +81,13 @@ public class TeleopSwerve extends Command {
         return this;
     }
 
-    public TeleopSwerve withfieldRelative(boolean fieldRelative) {
-        this.fieldRelative = fieldRelative;
+    public TeleopSwerve withRotationGoal(Rotation2d goal) {
+        this.rotationGoal = ()->goal;
+        return this;
+    }
+
+    public TeleopSwerve withRobotRelative(boolean robotRelative) {
+        this.fieldRelative = !robotRelative;
         return this;
     }
 
@@ -107,8 +115,8 @@ public class TeleopSwerve extends Command {
 
         double outputPercent = Math.min(multiplier.getAsDouble(),1);
 
-        double rotation = rAxis * SwerveConstants.maxAngularVelocity;
-        Translation2d translation = new Translation2d(Math.pow(magnitude, 2), theta).times(SwerveConstants.maxSpeed).times(outputPercent);
+        double rotation = rAxis * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RotationsPerSecond);
+        Translation2d translation = new Translation2d(Math.pow(magnitude, 2), theta).times(SwerveConstants.MAX_VELOCITY.in(MetersPerSecond)).times(outputPercent);
 
         swerveSubsystem.Drive(translation, rotation, fieldRelative, openLoop);
     }

@@ -149,8 +149,7 @@ public class TalonFactory {
     }
 
     public void stop() {
-        if (configure())
-            _motor.stopMotor();
+        _motor.stopMotor();
     }
     
     public void setControl(ControlRequest request) {

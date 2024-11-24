@@ -241,7 +241,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
      * @param openLoop Open or closed loop control
      */
     public void setModuleStates(SwerveModuleState[] desiredStates, boolean openLoop) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.MAX_VELOCITY);
         
         for(SwerveModule mod : _modules) 
           mod.setDesiredState(desiredStates[mod.moduleNumber], openLoop);

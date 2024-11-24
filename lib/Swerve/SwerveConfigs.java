@@ -42,7 +42,7 @@ public final class SwerveConfigs {
                 /** Swerve Angle Motor Configuration */
                 angle.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
                 angle.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-                angle.Feedback.SensorToMechanismRatio = SwerveConstants.angleGearRatio;
+                angle.Feedback.SensorToMechanismRatio = SwerveConstants.ANGLE_GEAR_RATIO;
                 angle.ClosedLoopGeneral.ContinuousWrap = true;
                 angle.CurrentLimits.SupplyCurrentLimitEnable = true;
                 angle.CurrentLimits.SupplyCurrentLimit = 25;
@@ -63,7 +63,7 @@ public final class SwerveConfigs {
                 /** Swerve Drive Motor Configuration */
                 drive.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
                 drive.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-                drive.Feedback.SensorToMechanismRatio = SwerveConstants.driveGearRatio;
+                drive.Feedback.SensorToMechanismRatio = SwerveConstants.DRIVE_GEAR_RATIO;
                 drive.CurrentLimits.SupplyCurrentLimitEnable = true;
                 drive.CurrentLimits.SupplyCurrentLimit = 25;
                 drive.CurrentLimits.SupplyCurrentLowerLimit = 60;
