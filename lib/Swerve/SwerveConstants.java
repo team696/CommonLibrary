@@ -67,15 +67,16 @@ public class SwerveConstants {
 		// Use Reca.lc to find Stall Torque At Motor Current Limit
 		// Values For Kraken X60
 		public static final AngularVelocity MAX_FREESPIN_VELOCITY = Rotations.of(6000).per(Minute);
-		public static final Torque MAX_MOTOR_STALL_TORQUE = NewtonMeters.of(2.102); 
+																			// Current Limit / Max Current / Torque At Max Current
+		public static final Torque MAX_MOTOR_STALL_TORQUE = NewtonMeters.of(SwerveConfigs.drive.CurrentLimits.StatorCurrentLimit / 366 * 7.09); 
 		public static final Force MAX_WHEEL_FORCE = MAX_MOTOR_STALL_TORQUE.times(DRIVE_GEAR_RATIO).div(WHEEL_RADIUS).times(expectedModuleCount);
 
 		public static final LinearVelocity THEORETICAL_MAX_SPEED = MetersPerSecond.of(MAX_FREESPIN_VELOCITY.in(RotationsPerSecond) * DISTANCE_PER_ROTATION.in(Meters.per(Rotation))); 
 		public static final LinearAcceleration THEORETICAL_MAX_ACCELERATION = (MAX_WHEEL_FORCE.div(MASS));  
 		public static final LinearVelocity MAX_VELOCITY = THEORETICAL_MAX_SPEED.times(0.85); 
 		public static final LinearAcceleration MAX_ACCELERATION = THEORETICAL_MAX_ACCELERATION.times(0.7); 
-		public static final AngularVelocity THEORETICAL_MAX_ANGULAR_VELOCITY = RotationsPerSecond.of(THEORETICAL_MAX_SPEED.in(MetersPerSecond) / (DRIVEBASE_RADIUS.in(Meters) * 2 * Math.PI));
-		public static final AngularVelocity MAX_ANGULAR_VELOCITY = THEORETICAL_MAX_ANGULAR_VELOCITY.times(0.85); 
+		public static final AngularVelocity THEORETICAL_MAX_ANGULAR_VELOCITY = RotationsPerSecond.of(MAX_VELOCITY.in(MetersPerSecond) / (DRIVEBASE_RADIUS.in(Meters) * 2 * Math.PI));
+		public static final AngularVelocity MAX_ANGULAR_VELOCITY = THEORETICAL_MAX_ANGULAR_VELOCITY.times(0.95); 
 		
 		//ASSUMES UNIFORM DISTRIBUTION, SHOULD BE CALCULATED EXPERIMENTALLY
 		public static final Mult<MultUnit<MassUnit, DistanceUnit>, DistanceUnit> THEORETICAL_MOMENT_OF_INERTIA = MASS.times(DRIVEBASE_RADIUS).times(DRIVEBASE_RADIUS).times(1/12);
