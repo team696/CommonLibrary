@@ -2,6 +2,7 @@ package frc.team696.lib.Swerve;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -19,15 +20,15 @@ import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.team696.lib.Util;
 import frc.team696.lib.HardwareDevices.CANCoderFactory;
 import frc.team696.lib.HardwareDevices.TalonFactory;
 
-public class SwerveModule implements Sendable{
+public class SwerveModule{
     public static int s_moduleCount = 0;
+    public static final String[] moduleNames = {"FL", "FR", "BL", "BR"}; 
 
     private final StatusSignal<Angle> _encoderSignal;
     private final StatusSignal<Angle> _anglePositionSignal;
@@ -37,7 +38,7 @@ public class SwerveModule implements Sendable{
 
     public static final int SIGNAL_COUNT = 4; 
 
-    public int moduleNumber;
+    public final int moduleNumber;
     private Rotation2d _angleOffset;
     
     private TalonFactory _angleMotor;
@@ -51,6 +52,9 @@ public class SwerveModule implements Sendable{
     private final VelocityVoltage _driveVelocity = new VelocityVoltage(0);
 
     private final PositionVoltage _anglePosition = new PositionVoltage(0);
+
+    private final double[] _sysidRotationPositions = new double[] {135, -135, -45, 45};
+
 
     public SwerveModule(SwerveModuleConstants moduleConstants){
         this.moduleNumber = s_moduleCount++;
@@ -88,9 +92,22 @@ public class SwerveModule implements Sendable{
         _lastAngle = angle;
     }
 
+    // For Use In SysID
+    public void setDesiredVoltageForward(Voltage volts) {
+        _driveMotor.VoltageOut(volts);
+        _angleMotor.setControl(_anglePosition.withPosition(0));
+    }
+    public void setDesiredVoltageRotation(Voltage volts) {
+        _driveMotor.VoltageOut(volts);
+        _angleMotor.setControl(_anglePosition.withPosition(_sysidRotationPositions[moduleNumber]));
+    }
+    public Voltage getDriveOutputVoltage() {
+        return Volts.of(_driveMotor.get().get() * RobotController.getBatteryVoltage());
+    }
+
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
         if(isOpenLoop){
-            _driveMotor.VoltageOut(desiredState.speedMetersPerSecond / SwerveConstants.MAX_VELOCITY.in(Units.MetersPerSecond));
+            _driveMotor.VoltageOut(Volts.of(desiredState.speedMetersPerSecond / SwerveConstants.MAX_VELOCITY.in(Units.MetersPerSecond)*12));
         } else {
             _driveVelocity.Velocity = Util.MPSToRPS(desiredState.speedMetersPerSecond, SwerveConstants.WHEEL_CIRCUM.in(Units.Meters));
             _driveVelocity.FeedForward = _driveFeedForward.calculate(Units.MetersPerSecond.of(desiredState.speedMetersPerSecond)).magnitude();
@@ -121,7 +138,7 @@ public class SwerveModule implements Sendable{
         }
         return new SwerveModuleState(
             Util.RPSToMPS(_driveVelocitySignal.getValueAsDouble(), SwerveConstants.WHEEL_CIRCUM.in(Units.Meters)), 
-            Rotation2d.fromRotations(getAngleMotorPosition(refresh))
+            Rotation2d.fromRotations(getAngleMotorPosition(refresh).in(Rotations))
         );
     }
 
@@ -131,47 +148,36 @@ public class SwerveModule implements Sendable{
 
     public SwerveModulePosition getPosition(){
         return new SwerveModulePosition(
-            Util.rotationsToMeters(getDriveMotorPosition(), SwerveConstants.WHEEL_CIRCUM.in(Units.Meters)), 
-            Rotation2d.fromRotations(getAngleMotorPosition())
+            Util.rotationsToMeters(getDriveMotorPosition().in(Rotations), SwerveConstants.WHEEL_CIRCUM.in(Units.Meters)), 
+            Rotation2d.fromRotations(getAngleMotorPosition().in(Rotations))
         );
     }
 
-    public double getDriveMotorPosition(boolean refresh) {
+    public Angle getDriveMotorPosition(boolean refresh) {
         if (refresh) {
             _drivePositionSignal.refresh();
             _driveVelocitySignal.refresh();
         }
-        return BaseStatusSignal.getLatencyCompensatedValue(_drivePositionSignal, _driveVelocitySignal).magnitude();
+        return Rotations.of(BaseStatusSignal.getLatencyCompensatedValue(_drivePositionSignal, _driveVelocitySignal).magnitude());
     }
 
-    public double getDriveMotorPosition() {
+    public Angle getDriveMotorPosition() {
         return getDriveMotorPosition(false);
     }
 
-    public double getAngleMotorPosition(boolean refresh) {
+    public Angle getAngleMotorPosition(boolean refresh) {
         if (refresh) {
             _anglePositionSignal.refresh();
             _angleVelocitySignal.refresh();
         }
-        return BaseStatusSignal.getLatencyCompensatedValue(_anglePositionSignal, _angleVelocitySignal).magnitude();
+        return Rotations.of(BaseStatusSignal.getLatencyCompensatedValue(_anglePositionSignal, _angleVelocitySignal).magnitude());
     }
 
-    public double getAngleMotorPosition() {
+    public Angle getAngleMotorPosition() {
         return getAngleMotorPosition(false);
     }
 
     public BaseStatusSignal[] getSignals(){
         return new BaseStatusSignal[] {_anglePositionSignal, _angleVelocitySignal, _drivePositionSignal, _driveVelocitySignal, _encoderSignal};
-    }
-
-    public void putData() {
-        SmartDashboard.putData("Swerve/Mod " + this.moduleNumber, this);
-    }
-
-    @Override 
-    public void initSendable(SendableBuilder builder) {
-        builder.addDoubleProperty("Motor Angle " + moduleNumber, this::getAngleMotorPosition, null);
-        builder.addDoubleProperty("Velocity " + moduleNumber, this::getDriveMotorPosition, null);
-        builder.addDoubleProperty("Encoder Angle " + moduleNumber, ()->this.getCANCoderAngle().getRotations(), null);
     }
 }

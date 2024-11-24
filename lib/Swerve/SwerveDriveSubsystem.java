@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -229,6 +230,16 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         setModuleStates(swerveModuleStates);
     } 
 
+    public void voltageDriveForward(Voltage volts) {
+        for(SwerveModule mod : _modules) 
+            mod.setDesiredVoltageForward(volts);
+    }
+
+    public void voltageRotateForward(Voltage volts) {
+        for(SwerveModule mod : _modules) 
+            mod.setDesiredVoltageRotation(volts);
+    }
+
     /**
      * Stops driving
      */
@@ -349,6 +360,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         odometryThread(SwerveDriveSubsystem this0) {
             this.this0 = this0;
 
+            this.setName("OdometryThread");
             this.setDaemon(true);
             this.setPriority(MIN_PRIORITY);
         }
@@ -392,7 +404,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
                 } finally {
                     this.this0._stateLock.writeLock().unlock();
                 }
-                Timer.delay(1.0 / 1000.0); //Limits To 1000 Hz
+                Timer.delay(1.0/250.0); //Limits To 250 Hz
             }
         }
     }

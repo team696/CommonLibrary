@@ -1,6 +1,11 @@
 package frc.team696.lib;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,22 +25,22 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team696.lib.Dashboards.ShuffleDashboard;
 import frc.team696.lib.Logging.PLog;
 import frc.team696.lib.Swerve.SwerveConfigs;
 import frc.team696.lib.Swerve.SwerveConstants;
 import frc.team696.lib.Swerve.SwerveDriveSubsystem;
+import frc.team696.lib.Swerve.SwerveModule;
 
 /**
  * Houses all methods related to the Autonomous period and self driving during teleop
@@ -62,12 +67,14 @@ public class Auto {
         }
     }
 
-    public static Auto m_instance;
+    public static Auto _instance;
     private SwerveDriveSubsystem _swerve;
 
-    private SendableChooser<Command> autoChooser;
+    private SendableChooser<Command> _autoChooser;
+    private SendableChooser<Command> _sysIdChooser;
 
-    private StringPublisher chooserChanger;
+    private final boolean outputSYSID = false;
+    private SysIdRoutine _driveSysIdRoutine;
 
     private Auto (SwerveDriveSubsystem swerve, boolean shouldUseGUIValues, NamedCommand... commandsToRegister) {
         _swerve = swerve;
@@ -124,16 +131,43 @@ public class Auto {
             ShuffleDashboard.field.getObject("Path").setPoses(poses);
         });
 
-        autoChooser = AutoBuilder.buildAutoChooser();
-        ShuffleDashboard.addAutoChooser(autoChooser);
+        _driveSysIdRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.per(Second).of(1), 
+                Volts.of(3), 
+                Seconds.of(10)), 
+            new SysIdRoutine.Mechanism(swerve::voltageDriveForward, log -> {
+                for (int i = 0; i < SwerveModule.s_moduleCount; i++) {
+                    log.motor(SwerveModule.moduleNames[i])
+                    .voltage(swerve.getModules()[i].getDriveOutputVoltage())
+                    .linearPosition(Meters.of(SwerveConstants.DISTANCE_PER_ROTATION.timesDivisor(swerve.getModules()[i].getDriveMotorPosition()).magnitude()))
+                    .linearVelocity(MetersPerSecond.of(SwerveConstants.DISTANCE_PER_ROTATION.times(swerve.getModules()[i].getState().speedMetersPerSecond).magnitude()));
+                }
+            }, swerve));
 
-        chooserChanger = NetworkTableInstance.getDefault().getStringTopic("Shuffleboard/Telemetry/Autos/selected").publish();
+        if (!outputSYSID){ 
+            _autoChooser = AutoBuilder.buildAutoChooser();
+            ShuffleDashboard.addAutoChooser(_autoChooser);
 
-        ShuffleDashboard.addObject("ChooseNearest (Doesn't Work)", Commands.runOnce(()->chooserChanger.accept(ClosestName())).ignoringDisable(true)).withPosition(7, 1).withSize(2,1);
+            _autoChooser.onChange((command)-> {
+                visualize();
+            });
+        } else {
+            _sysIdChooser = new SendableChooser<>();
+            _sysIdChooser.setDefaultOption("None", Commands.none());
 
-        autoChooser.onChange((command)-> {
-            visualize();
-        });
+            generateSysIDAutos();
+
+            SmartDashboard.putData("SysID Test Chooser",_sysIdChooser);
+        }
+    }
+
+    public void generateSysIDAutos() {
+        _sysIdChooser.addOption("Drive Quasistatic Forwards", _driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
+        _sysIdChooser.addOption("Drive Quasistatic Backwards", _driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
+
+        _sysIdChooser.addOption("Drive Dynamic Forwards", _driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
+        _sysIdChooser.addOption("Drive Dynamic Backwards", _driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
     }
 
     /**
@@ -143,9 +177,9 @@ public class Auto {
      * @param commandsToRegister each command to register for path planner
      */
     public static void Initialize(SwerveDriveSubsystem swerve, NamedCommand... commandsToRegister){
-        if (m_instance != null) throw new RuntimeException ("Don't Initialize Twice!");
+        if (_instance != null) throw new RuntimeException ("Don't Initialize Twice!");
         
-        m_instance = new Auto(swerve, false, commandsToRegister);
+        _instance = new Auto(swerve, false, commandsToRegister);
     }
 
     /**
@@ -156,25 +190,29 @@ public class Auto {
      * @param commandsToRegister each command to register for path planner
      */
     public static void Initialize(SwerveDriveSubsystem swerve, boolean shouldUseGUIValues, NamedCommand... commandsToRegister){
-        if (m_instance != null) throw new RuntimeException ("Don't Initialize Twice!");
+        if (_instance != null) throw new RuntimeException ("Don't Initialize Twice!");
         
-        m_instance = new Auto(swerve, shouldUseGUIValues, commandsToRegister);
+        _instance = new Auto(swerve, shouldUseGUIValues, commandsToRegister);
     }
 
     /**
      * @return The instance Of the Auto Class
      */
     public static Auto get(){
-        if (m_instance == null) throw new RuntimeException ("Please Initialize First!");
+        if (_instance == null) throw new RuntimeException ("Please Initialize First!");
 
-        return m_instance;
+        return _instance;
     }
 
     /**
      * @return Selected Command From SendableChooser
      */
     public Command Selected() {
-        return m_instance.autoChooser.getSelected();
+        if (!outputSYSID) {
+            return _autoChooser.getSelected();
+        } else {
+            return _sysIdChooser.getSelected();
+        }
     }
 
     /**
@@ -185,55 +223,8 @@ public class Auto {
         return Selected().raceWith(new WaitCommand(15.0));
     }
 
-    public String ClosestName() {
-        List<String> autoNames = AutoBuilder.getAllAutoNames();
-        double minDist = 100;
-        String closestName = "None";
-        for (int i = 0; i < autoNames.size(); i++) {
-            String autoName = autoNames.get(i);
-            try {
-                List<PathPlannerPath> poses = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
-                if (poses.size() == 0) continue;
-                Pose2d startingPose = poses.get(0).getStartingDifferentialPose();
-                Translation2d autoStartingPose = startingPose.getTranslation();
-                double dist = _swerve.getPose().getTranslation().getDistance(autoStartingPose);
-                PLog.info("Test", dist);
-                if (dist < minDist) {
-                    minDist = dist;
-                    closestName = autoName;
-                }
-            } catch (Exception e) {
-                PLog.fatalException("Auto", autoName, e);
-            } 
-        }
-
-        return closestName;
-    }
-
-    public Command ClosestCommand() {
-        if (ClosestName().compareTo("None") == 0) return Commands.none();
-
-        return AutoBuilder.buildAuto(ClosestName());
-    }
-
     public static Command PathFind(Pose2d end) {
         return AutoBuilder.pathfindToPose(end, new PathConstraints(1, 1, Math.PI,Math.PI));
-    }
-
-    public Command PathFindToAutoBeginning() {
-        Pose2d initialPose;
-        try {
-            List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(autoChooser.getSelected().getName());
-
-            if (paths.size() <= 0) return Commands.none();
-
-            initialPose = paths.get(0).getStartingDifferentialPose();
-        } catch (Exception e) {
-            PLog.fatalException("Auto", "Failed To Find Path", e);
-            return Commands.none();
-        }
-
-        return AutoBuilder.pathfindToPose(initialPose, new PathConstraints(1, 1, Math.PI, Math.PI));
     }
 
     public void visualize(String name) {
@@ -255,6 +246,8 @@ public class Auto {
     }
 
     public void visualize() {
-        visualize(autoChooser.getSelected().getName());
+        visualize(_autoChooser.getSelected().getName());
     }
+
+
 }

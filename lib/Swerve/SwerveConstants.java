@@ -51,7 +51,7 @@ public class SwerveConstants {
 		public static final double DRIVE_GEAR_RATIO = (5.36 / 1.0);
 		public static final double ANGLE_GEAR_RATIO = (150.0 / 7.0 / 1.0); 
 	
-		public static final Mass MASS = Pounds.of(150);
+		public static final Mass MASS = Pounds.of(140);
 
 		// Distance From The Center To The Wheel, From The Distance Between Two Wheels divided By 2
 		public static final Distance WHEELBASE_X = Inches.of(13.0).div(2);
@@ -61,7 +61,7 @@ public class SwerveConstants {
 		public static final Distance WHEEL_RADIUS = WHEEL_DIAMETER.div(2);
 		public static final Distance WHEEL_CIRCUM = WHEEL_DIAMETER.times(Math.PI);
 		public static final double WHEEL_COEFFICIENT_OF_FRICTION = 1.2;
-
+	
 		public static final Per<DistanceUnit, AngleUnit> DISTANCE_PER_ROTATION = WHEEL_CIRCUM.div(DRIVE_GEAR_RATIO).div(Rotations.of(1));
 
 		// Use Reca.lc to find Stall Torque At Motor Current Limit
