@@ -1,10 +1,9 @@
-# 696 Library for FRC 2024 season
+# 696 Library for FRC 2025 season
 
 ## Usage: 
-Command Line:
- - Go To Root of your project (one with the src folder and gradle files) 
-
 ### Automatic Install
+ - Go To Root of your project (one with the src folder and gradle files) 
+ - Run
 ``` 
 git submodule add --name team696Library https://github.com/team696/CommonLibrary.git src/main/java/team696 
 ```
