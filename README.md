@@ -1,7 +1,15 @@
-# 696 Library for FRC 2024 season
+## 696 Library for FRC 2024 season
 
-# Usage:
-    Download Zip And Drag team696 Folder Into /frc/ Directory Next To /robot/
+# Usage: 
+    Command Line
+        Go To Root of your project (one with the src folder and gradle files)
+
+        ``` 
+        run git submodule add --name team696Library https://github.com/team696/CommonLibrary.git src/main/java/team696 
+        ```
+
+    Manual 
+        Download Zip And Drag team696 Folder Into /frc/ Directory Next To /robot/
 
     add to build.gradle dependencies
         implementation 'com.sun.net.httpserver:http:20070405'
