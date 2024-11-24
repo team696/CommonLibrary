@@ -8,13 +8,15 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.BuildConstants;
 
-/** Add your docs here. */
+/** Simple Setup for Advantage Kit */
+@SuppressWarnings("resource")
 public class AdvantageKitLog {
-    public static void setup() {
-        Logger.recordMetadata("ProjectName", "2024OffSeason");
+    public static final void setup() {
         Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
         Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
@@ -34,6 +36,7 @@ public class AdvantageKitLog {
 
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         if (RobotBase.isReal()) {
+            new PowerDistribution(1, ModuleType.kRev);
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
         }
 
