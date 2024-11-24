@@ -1,5 +1,9 @@
 package frc.team696.lib.Swerve;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -11,6 +15,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -41,7 +46,7 @@ public class SwerveModule implements Sendable{
 
     private Rotation2d _lastAngle;
 
-    private final SimpleMotorFeedforward _driveFeedForward = new SimpleMotorFeedforward(SwerveConstants.drivekS, SwerveConstants.drivekV, SwerveConstants.drivekA);
+    private final SimpleMotorFeedforward _driveFeedForward = new SimpleMotorFeedforward(SwerveConstants.drivekS.in(Volts), SwerveConstants.drivekV.in(PerUnit.combine(Volts, MetersPerSecond)), SwerveConstants.drivekA.in(PerUnit.combine(Volts,MetersPerSecondPerSecond)));
     
     private final VelocityVoltage _driveVelocity = new VelocityVoltage(0);
 
