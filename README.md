@@ -5,7 +5,7 @@
  - Go To Root of your project (one with the src folder and gradle files) 
  - Run
 ``` 
-git submodule add --name team696Library https://github.com/team696/CommonLibrary.git src/main/java/team696 
+git submodule add --name team696Library https://github.com/team696/CommonLibrary.git src/main/java/frc/team696 
 ```
 
 ### Manual Install
