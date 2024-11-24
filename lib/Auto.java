@@ -1,5 +1,7 @@
 package frc.team696.lib;
 
+import static edu.wpi.first.units.Units.Amps;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +11,7 @@ import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -18,15 +21,20 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.team696.lib.Dashboards.ShuffleDashboard;
 import frc.team696.lib.Logging.PLog;
+import frc.team696.lib.Swerve.SwerveConfigs;
+import frc.team696.lib.Swerve.SwerveConstants;
 import frc.team696.lib.Swerve.SwerveDriveSubsystem;
 
 /**
@@ -61,18 +69,30 @@ public class Auto {
 
     private StringPublisher chooserChanger;
 
-    private Auto (SwerveDriveSubsystem swerve, NamedCommand... commandsToRegister) {
+    private Auto (SwerveDriveSubsystem swerve, boolean shouldUseGUIValues, NamedCommand... commandsToRegister) {
         _swerve = swerve;
         
-        RobotConfig config;
-        try{
-            config = RobotConfig.fromGUISettings();
-        } catch (Exception e) {
-            // Handle exception as needed
-            PLog.fatalException("Auto", "Failed To Get RobotConfig", e); 
-            return;
+        RobotConfig config = new RobotConfig(
+            SwerveConstants.MASS, 
+            SwerveConstants.MOMENT_OF_INERTIA, 
+            new ModuleConfig(
+                SwerveConstants.WHEEL_RADIUS, 
+                SwerveConstants.MAX_VELOCITY, 
+                SwerveConstants.WHEEL_COEFFICIENT_OF_FRICTION, 
+                DCMotor.getKrakenX60(1), 
+                Amps.of(SwerveConfigs.drive.CurrentLimits.StatorCurrentLimit), 
+                1), 
+            SwerveConstants.WHEELBASE_X.times(2),
+            SwerveConstants.WHEELBASE_Y.times(2));
+        if (shouldUseGUIValues) { 
+            try{
+                config = RobotConfig.fromGUISettings();
+            } catch (Exception e) {
+                PLog.fatalException("Auto", "Failed To Get RobotConfig", e); 
+                Shuffleboard.addEventMarker("Failed to fetch robotConfig GUI Settings", EventImportance.kHigh);
+            }
         }
-
+            
         AutoBuilder.configure(
             _swerve::getPose, 
             _swerve::resetPose, 
@@ -125,7 +145,20 @@ public class Auto {
     public static void Initialize(SwerveDriveSubsystem swerve, NamedCommand... commandsToRegister){
         if (m_instance != null) throw new RuntimeException ("Don't Initialize Twice!");
         
-        m_instance = new Auto(swerve, commandsToRegister);
+        m_instance = new Auto(swerve, false, commandsToRegister);
+    }
+
+    /**
+     * Initializes all things related to auto (ex. pathplanner)
+     * 
+     * @param swerve The swerve subsystem
+     * @param shouldUseGUIValues Should Pathplanner fetch Robot Config from GUI?
+     * @param commandsToRegister each command to register for path planner
+     */
+    public static void Initialize(SwerveDriveSubsystem swerve, boolean shouldUseGUIValues, NamedCommand... commandsToRegister){
+        if (m_instance != null) throw new RuntimeException ("Don't Initialize Twice!");
+        
+        m_instance = new Auto(swerve, shouldUseGUIValues, commandsToRegister);
     }
 
     /**
@@ -178,7 +211,7 @@ public class Auto {
     }
 
     public Command ClosestCommand() {
-        if (ClosestName().compareTo("None") == 0) return new WaitCommand(0);
+        if (ClosestName().compareTo("None") == 0) return Commands.none();
 
         return AutoBuilder.buildAuto(ClosestName());
     }
@@ -192,12 +225,12 @@ public class Auto {
         try {
             List<PathPlannerPath> paths = PathPlannerAuto.getPathGroupFromAutoFile(autoChooser.getSelected().getName());
 
-            if (paths.size() <= 0) return new WaitCommand(0);
+            if (paths.size() <= 0) return Commands.none();
 
             initialPose = paths.get(0).getStartingDifferentialPose();
         } catch (Exception e) {
             PLog.fatalException("Auto", "Failed To Find Path", e);
-            return new WaitCommand(0);
+            return Commands.none();
         }
 
         return AutoBuilder.pathfindToPose(initialPose, new PathConstraints(1, 1, Math.PI, Math.PI));

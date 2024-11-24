@@ -20,20 +20,20 @@ public final class SwerveConfigs {
         public final static TalonFXConfiguration drive;
         public final static CANcoderConfiguration canCoder;
         public final static Pigeon2Configuration pigeon;
-        public final static SwerveModuleConstants Mod0;
-        public final static SwerveModuleConstants Mod1;
-        public final static SwerveModuleConstants Mod2;
-        public final static SwerveModuleConstants Mod3;
+        public final static SwerveModuleConstants FRONT_LEFT;
+        public final static SwerveModuleConstants FRONT_RIGHT;
+        public final static SwerveModuleConstants BACK_LEFT;
+        public final static SwerveModuleConstants BACK_RIGHT;
         static {
                 angle = new TalonFXConfiguration();
                 drive = new TalonFXConfiguration();
                 canCoder = new CANcoderConfiguration();  
                 pigeon = new Pigeon2Configuration();
 
-                Mod0 = new SwerveModuleConstants();
-                Mod1 = new SwerveModuleConstants();
-                Mod2 = new SwerveModuleConstants();
-                Mod3 = new SwerveModuleConstants();
+                FRONT_LEFT = new SwerveModuleConstants();
+                FRONT_RIGHT = new SwerveModuleConstants();
+                BACK_LEFT = new SwerveModuleConstants();
+                BACK_RIGHT = new SwerveModuleConstants();
                 
                 /** Swerve CANCoder Configuration */
                 canCoder.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
@@ -46,17 +46,16 @@ public final class SwerveConfigs {
                 angle.ClosedLoopGeneral.ContinuousWrap = true;
                 angle.CurrentLimits.SupplyCurrentLimitEnable = true;
                 angle.CurrentLimits.SupplyCurrentLimit = 25;
-                angle.CurrentLimits.SupplyCurrentLowerLimit = 40;
+                angle.CurrentLimits.SupplyCurrentLowerLimit = 60;
                 angle.CurrentLimits.SupplyCurrentLowerTime = 0.1;
                 angle.CurrentLimits.StatorCurrentLimitEnable = true;
-                angle.CurrentLimits.StatorCurrentLimit = 40;
-                angle.Slot0.kP = 175.0;
+                angle.CurrentLimits.StatorCurrentLimit = 80;
+                angle.Slot0.kP = 150.0;
                 angle.Slot0.kI = 0.0;
                 angle.Slot0.kD = 0.0;
 
                 angle.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0;
                 angle.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0;
-
                 angle.Voltage.PeakForwardVoltage = 12.;
                 angle.Voltage.PeakReverseVoltage = -12.;
 
@@ -66,42 +65,41 @@ public final class SwerveConfigs {
                 drive.Feedback.SensorToMechanismRatio = SwerveConstants.DRIVE_GEAR_RATIO;
                 drive.CurrentLimits.SupplyCurrentLimitEnable = true;
                 drive.CurrentLimits.SupplyCurrentLimit = 25;
-                drive.CurrentLimits.SupplyCurrentLowerLimit = 60;
+                drive.CurrentLimits.SupplyCurrentLowerLimit = 90;
                 drive.CurrentLimits.SupplyCurrentLowerTime = 0.2;
                 drive.CurrentLimits.StatorCurrentLimitEnable = true;
-                drive.CurrentLimits.StatorCurrentLimit = 60;
-
+                drive.CurrentLimits.StatorCurrentLimit = 110;
                 drive.Voltage.PeakForwardVoltage = 12.;
                 drive.Voltage.PeakReverseVoltage = -12.;
 
                 drive.Slot0.kP = 2.;
                 drive.Slot0.kI = 0.0;
                 drive.Slot0.kD = 0.0;
-                drive.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.2;
-                drive.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.2;
+                drive.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.25;
+                drive.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.25;
                 drive.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.02;
                 drive.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
-                /** Individual Swerve Module Configurations -> frontLeft, frontRight, backLeft, backRight */ 
-                Mod0.CANcoderId = 0;  
-                Mod0.DriveMotorId = 3; 
-                Mod0.SteerMotorId = 6;
-                Mod0.CANcoderOffset = -0.313;
-        
-                Mod1.CANcoderId = 3; 
-                Mod1.DriveMotorId = 4;
-                Mod1.SteerMotorId = 7;
-                Mod1.CANcoderOffset = 0.272;
+                /** Individual Swerve Module Configurations */ 
+                FRONT_LEFT.CANcoderId = 1;  
+                FRONT_LEFT.DriveMotorId = 1; 
+                FRONT_LEFT.SteerMotorId = 2;
+                FRONT_LEFT.CANcoderOffset = -0.;
 
-                Mod2.CANcoderId = 2; 
-                Mod2.DriveMotorId = 2;
-                Mod2.SteerMotorId = 1;
-                Mod2.CANcoderOffset = 0.372;
+                FRONT_RIGHT.CANcoderId = 2; 
+                FRONT_RIGHT.DriveMotorId = 3;
+                FRONT_RIGHT.SteerMotorId = 4;
+                FRONT_RIGHT.CANcoderOffset = 0.;
 
-                Mod3.CANcoderId = 1; 
-                Mod3.DriveMotorId = 5;
-                Mod3.SteerMotorId = 0;
-                Mod3.CANcoderOffset = 0.359;
+                BACK_LEFT.CANcoderId = 3; 
+                BACK_LEFT.DriveMotorId = 5;
+                BACK_LEFT.SteerMotorId = 6;
+                BACK_LEFT.CANcoderOffset = 0.;
+
+                BACK_RIGHT.CANcoderId = 4; 
+                BACK_RIGHT.DriveMotorId = 7;
+                BACK_RIGHT.SteerMotorId = 8;
+                BACK_RIGHT.CANcoderOffset = 0.;
 
                 /** Pigeon Configuration */ 
                 pigeon.MountPose.MountPoseYaw = 0;

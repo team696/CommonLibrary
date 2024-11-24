@@ -55,10 +55,10 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
         this._stateLock = new ReentrantReadWriteLock();
         this._cachedState = new SwerveDriveState();
 
-		SwerveModule frontLeft = new SwerveModule(SwerveConfigs.Mod0);
-		SwerveModule frontRight = new SwerveModule(SwerveConfigs.Mod1);
-		SwerveModule backLeft = new SwerveModule(SwerveConfigs.Mod2);
-		SwerveModule backRight = new SwerveModule(SwerveConfigs.Mod3);
+		SwerveModule frontLeft = new SwerveModule(SwerveConfigs.FRONT_LEFT);
+		SwerveModule frontRight = new SwerveModule(SwerveConfigs.FRONT_RIGHT);
+		SwerveModule backLeft = new SwerveModule(SwerveConfigs.BACK_LEFT);
+		SwerveModule backRight = new SwerveModule(SwerveConfigs.BACK_RIGHT);
 		_modules = new SwerveModule[]{ frontLeft, frontRight, backLeft, backRight };
 
         _kinematics = new SwerveDriveKinematics(SwerveConstants.modPositions);
