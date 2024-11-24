@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -71,10 +72,8 @@ public class Auto {
     private SwerveDriveSubsystem _swerve;
 
     private SendableChooser<Command> _autoChooser;
-    private SendableChooser<Command> _sysIdChooser;
 
-    private final boolean outputSYSID = false;
-    private SysIdRoutine _driveSysIdRoutine;
+    public SysIdRoutine _driveSysIdRoutine; 
 
     private Auto (SwerveDriveSubsystem swerve, boolean shouldUseGUIValues, NamedCommand... commandsToRegister) {
         _swerve = swerve;
@@ -131,43 +130,46 @@ public class Auto {
             ShuffleDashboard.field.getObject("Path").setPoses(poses);
         });
 
-        _driveSysIdRoutine = new SysIdRoutine(
+        _autoChooser = AutoBuilder.buildAutoChooser();
+        ShuffleDashboard.addAutoChooser(_autoChooser);
+
+        _autoChooser.onChange((command)-> {
+            visualize();
+        });     
+
+        /*
+         *  Default SysIdRoutine
+         * 
+         *  Copy in your subsystem to add more.
+         */
+        _driveSysIdRoutine =  new SysIdRoutine(
             new SysIdRoutine.Config(
                 Volts.per(Second).of(1), 
                 Volts.of(3), 
                 Seconds.of(10)), 
-            new SysIdRoutine.Mechanism(swerve::voltageDriveForward, log -> {
+            new SysIdRoutine.Mechanism(_swerve::voltageDriveForward, log -> {
                 for (int i = 0; i < SwerveModule.s_moduleCount; i++) {
                     log.motor(SwerveModule.moduleNames[i])
-                    .voltage(swerve.getModules()[i].getDriveOutputVoltage())
-                    .linearPosition(Meters.of(SwerveConstants.DISTANCE_PER_ROTATION.timesDivisor(swerve.getModules()[i].getDriveMotorPosition()).magnitude()))
-                    .linearVelocity(MetersPerSecond.of(SwerveConstants.DISTANCE_PER_ROTATION.times(swerve.getModules()[i].getState().speedMetersPerSecond).magnitude()));
+                    .voltage(_swerve.getModules()[i].getDriveOutputVoltage())
+                    .linearPosition(Meters.of(SwerveConstants.DISTANCE_PER_ROTATION.timesDivisor(_swerve.getModules()[i].getDriveMotorPosition()).magnitude()))
+                    .linearVelocity(MetersPerSecond.of(SwerveConstants.DISTANCE_PER_ROTATION.times(_swerve.getModules()[i].getState().speedMetersPerSecond).magnitude()));
                 }
-            }, swerve));
-
-        if (!outputSYSID){ 
-            _autoChooser = AutoBuilder.buildAutoChooser();
-            ShuffleDashboard.addAutoChooser(_autoChooser);
-
-            _autoChooser.onChange((command)-> {
-                visualize();
-            });
-        } else {
-            _sysIdChooser = new SendableChooser<>();
-            _sysIdChooser.setDefaultOption("None", Commands.none());
-
-            generateSysIDAutos();
-
-            SmartDashboard.putData("SysID Test Chooser",_sysIdChooser);
-        }
+            }, _swerve));  
     }
 
-    public void generateSysIDAutos() {
-        _sysIdChooser.addOption("Drive Quasistatic Forwards", _driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
-        _sysIdChooser.addOption("Drive Quasistatic Backwards", _driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
+    public static Supplier<Command> generateSysIDAutos( SysIdRoutine routine ) {
+        SendableChooser<Command> _sysIdChooser = new SendableChooser<>();
+        _sysIdChooser.setDefaultOption("None", Commands.none());
 
-        _sysIdChooser.addOption("Drive Dynamic Forwards", _driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
-        _sysIdChooser.addOption("Drive Dynamic Backwards", _driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+        _sysIdChooser.addOption("Quasistatic Forwards", routine.quasistatic(SysIdRoutine.Direction.kForward));
+        _sysIdChooser.addOption("Quasistatic Backwards", routine.quasistatic(SysIdRoutine.Direction.kReverse));
+
+        _sysIdChooser.addOption("Dynamic Forwards", routine.dynamic(SysIdRoutine.Direction.kForward));
+        _sysIdChooser.addOption("Dynamic Backwards", routine.dynamic(SysIdRoutine.Direction.kReverse));
+
+        SmartDashboard.putData("SysID Test Chooser",_sysIdChooser);
+
+        return _sysIdChooser::getSelected;
     }
 
     /**
@@ -208,11 +210,7 @@ public class Auto {
      * @return Selected Command From SendableChooser
      */
     public Command Selected() {
-        if (!outputSYSID) {
-            return _autoChooser.getSelected();
-        } else {
-            return _sysIdChooser.getSelected();
-        }
+        return _autoChooser.getSelected();
     }
 
     /**
