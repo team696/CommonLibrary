@@ -15,9 +15,9 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.team696.lib.Logging.PLog;
 
 /**
@@ -41,12 +41,15 @@ public class TalonFactory {
     private boolean _configured = false;
     private double _lastConfiguration = -100;
 
+    private Alert configurationAlert;
+
     public TalonFactory(int id, String canBus, TalonFXConfiguration config, String name) {
         this._motor = new TalonFX(id, canBus);
         this._name = name;
         this._config = config;
         _DutyCycleControl = new DutyCycleOut(0);
         _VoltageControl = new VoltageOut(0);
+        configurationAlert = new Alert(String.format("Failed to configure %s", this._name), AlertType.kError);
         configure();
     }
 
@@ -81,8 +84,7 @@ public class TalonFactory {
             _configured = true;
         }
 
-        if (!_configured)
-            Shuffleboard.addEventMarker(String.format("Failed to configure %s", this._name), EventImportance.kCritical);
+        configurationAlert.set(!_configured);
 
         return _configured;
     }

@@ -7,9 +7,9 @@ import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.team696.lib.Logging.PLog;
 
 /**
@@ -28,10 +28,13 @@ public class CANCoderFactory {
     private boolean _configured = false;
     private double _lastConfiguration = -100;
 
+    private Alert configurationAlert;
+
     public CANCoderFactory(int id, String canBus, CANcoderConfiguration config, String name) {
         this._encoder = new CANcoder(id, canBus);
         this._name = name;
         this._config = config;
+        configurationAlert = new Alert(String.format("Failed to configure %s", this._name), AlertType.kError);
         configure();
     }
 
@@ -61,8 +64,7 @@ public class CANCoderFactory {
             _configured = true;
         }
 
-        if (!_configured)
-            Shuffleboard.addEventMarker(String.format("Failed to configure %s", this._name), EventImportance.kCritical);
+        configurationAlert.set(!_configured);
 
         return _configured;
     }

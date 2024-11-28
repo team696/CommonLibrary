@@ -27,7 +27,9 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -95,7 +97,7 @@ public class Auto {
                 config = RobotConfig.fromGUISettings();
             } catch (Exception e) {
                 PLog.fatalException("Auto", "Failed To Get RobotConfig", e); 
-                Shuffleboard.addEventMarker("Failed to fetch robotConfig GUI Settings", EventImportance.kHigh);
+                new Alert("Failed to fetch robotConfig GUI Settings", AlertType.kWarning).set(true);
             }
         }
             

@@ -10,9 +10,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.team696.lib.Logging.PLog;
 
 /**
@@ -31,10 +31,13 @@ public class PigeonFactory implements GyroInterface {
     public StatusSignal<Angle> _yawSignal;
     public StatusSignal<AngularVelocity> _yawVelocitySignal;
 
+    private Alert configurationAlert;
+
     public PigeonFactory(int id, String canBus, Pigeon2Configuration config, String name) {
         this._gyro = new Pigeon2(id, canBus);
         this._name = name;
         this._config = config;
+        configurationAlert = new Alert(String.format("Failed to configure %s", this._name), AlertType.kError);
         configure();
     }
 
@@ -77,8 +80,7 @@ public class PigeonFactory implements GyroInterface {
 
         _gyro.optimizeBusUtilization();
 
-        if (!_configured)
-            Shuffleboard.addEventMarker(String.format("Failed to configure %s", this._name), EventImportance.kCritical);
+        configurationAlert.set(!_configured);
 
         return _configured;
     }
