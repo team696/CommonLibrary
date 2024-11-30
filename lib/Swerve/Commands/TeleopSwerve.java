@@ -1,15 +1,19 @@
 package frc.team696.lib.Swerve.Commands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.fasterxml.jackson.databind.DeserializationConfig;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.team696.lib.Util;
 import frc.team696.lib.Swerve.SwerveConstants;
@@ -115,9 +119,25 @@ public class TeleopSwerve extends Command {
 
         double outputPercent = Math.min(multiplier.getAsDouble(),1);
 
-        double rotation = rAxis * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RotationsPerSecond);
-        Translation2d translation = new Translation2d(Math.pow(magnitude, 2), theta).times(SwerveConstants.MAX_VELOCITY.in(MetersPerSecond)).times(outputPercent);
+        double desiredRotation = rAxis * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RotationsPerSecond);
+        Translation2d desiredTranslation = new Translation2d(Math.pow(magnitude, 2), theta).times(SwerveConstants.MAX_VELOCITY.in(MetersPerSecond)).times(outputPercent);
 
-        swerveSubsystem.Drive(translation, rotation, fieldRelative, openLoop);
+        /* Untested Portion Begin */
+        Translation2d curVel = swerveSubsystem.getState().velocityXY();
+        Translation2d desiredAcceleration = desiredTranslation.minus(curVel);
+        double accelerationLimit = SwerveConstants.MAX_ACCELERATION.in(MetersPerSecondPerSecond) * (1 - curVel.getNorm() / SwerveConstants.MAX_VELOCITY.in(MetersPerSecond));
+
+        desiredAcceleration = desiredAcceleration.div(desiredAcceleration.getNorm()).times(accelerationLimit);
+
+        double accelerationXYScaling = Math.max(Math.max(1 , Math.abs(desiredAcceleration.getX()) / SwerveConstants.MAX_ACCELERATION_X.in(MetersPerSecondPerSecond) ), Math.abs(desiredAcceleration.getY()) / SwerveConstants.MAX_ACCELERATION_Y.in(MetersPerSecondPerSecond));
+        desiredAcceleration = desiredAcceleration.div(desiredAcceleration.getNorm()).times(accelerationXYScaling);
+
+        double maxSkidAcceleration = Math.max(1, desiredAcceleration.getNorm() / SwerveConstants.MAX_ACCELERATION_SKID.in(MetersPerSecondPerSecond));
+        desiredAcceleration = desiredAcceleration.div(desiredAcceleration.getNorm()).times(maxSkidAcceleration);
+
+        desiredTranslation = curVel.plus(desiredAcceleration);
+        /* Untested Portion End */
+
+        swerveSubsystem.Drive(desiredTranslation, desiredRotation, fieldRelative, openLoop);
     }
 }

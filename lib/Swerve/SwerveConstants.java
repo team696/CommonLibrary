@@ -78,6 +78,15 @@ public class SwerveConstants {
 		public static final AngularVelocity THEORETICAL_MAX_ANGULAR_VELOCITY = RotationsPerSecond.of(MAX_VELOCITY.in(MetersPerSecond) / (DRIVEBASE_RADIUS.in(Meters) * 2 * Math.PI));
 		public static final AngularVelocity MAX_ANGULAR_VELOCITY = THEORETICAL_MAX_ANGULAR_VELOCITY.times(0.95); 
 		
+		/* Credit To 1690s Software Session Part 1
+		 * Forward limit -> Max Acceleration Magnitude -> MaxAcc * (1 - curVel / maxVel)-> see TeleopSwerve.java for usage
+		 * Tilt limit -> Limits Magnitude of Accelx and Accely -> MaxFrontAccel & MaxSideAcc
+		 * Skid Limit -> Limits Max Acceleration Of the robot to prevent skidding
+		 */
+		public static final LinearAcceleration MAX_ACCELERATION_X =    MetersPerSecondPerSecond.of(10000000);
+		public static final LinearAcceleration MAX_ACCELERATION_Y =    MetersPerSecondPerSecond.of(10000000);
+		public static final LinearAcceleration MAX_ACCELERATION_SKID = MetersPerSecondPerSecond.of(10000000); 
+		
 		//ASSUMES UNIFORM DISTRIBUTION, SHOULD BE CALCULATED EXPERIMENTALLY
 		public static final Mult<MultUnit<MassUnit, DistanceUnit>, DistanceUnit> THEORETICAL_MOMENT_OF_INERTIA = MASS.times(DRIVEBASE_RADIUS).times(DRIVEBASE_RADIUS).times(1/12);
 

@@ -7,6 +7,7 @@ package frc.team696.lib.Swerve;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -39,15 +40,23 @@ public class SwerveDriveState {
 
     /**
      * 
-     * @return Current X,Y velocity of the robot
+     * @return Current X,Y velocity of the robot in M/S
      */
     public double velocity() {
         return Math.sqrt(robotRelativeSpeeds.vxMetersPerSecond * robotRelativeSpeeds.vxMetersPerSecond + robotRelativeSpeeds.vyMetersPerSecond * robotRelativeSpeeds.vyMetersPerSecond);
     }
 
+    /*
+     * 
+     * 
+     */
+    public Translation2d velocityXY() {
+        return new Translation2d(robotRelativeSpeeds.vxMetersPerSecond, robotRelativeSpeeds.vyMetersPerSecond);
+    }
+
     /**
      * 
-     * @return Current Rotational Velocity of the robot
+     * @return Current Rotational Velocity of the robot in Rad/s
      */
     public double angularVelocity() {
         return Math.abs(robotRelativeSpeeds.omegaRadiansPerSecond);
