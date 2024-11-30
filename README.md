@@ -13,7 +13,7 @@ git submodule add --name team696Library https://github.com/team696/CommonLibrary
 ### Manual Install
 Download Zip And Drag team696 Folder Into /frc/ Directory Next To /robot/
 
-## Requirements:
+# Requirements:
 
 ### Libraries:
 
