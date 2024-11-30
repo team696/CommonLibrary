@@ -3,17 +3,15 @@ package frc.team696.lib.Swerve.Commands;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.databind.DeserializationConfig;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.team696.lib.Util;
 import frc.team696.lib.Swerve.SwerveConstants;
@@ -123,6 +121,9 @@ public class TeleopSwerve extends Command {
         Translation2d desiredTranslation = new Translation2d(Math.pow(magnitude, 2), theta).times(SwerveConstants.MAX_VELOCITY.in(MetersPerSecond)).times(outputPercent);
 
         /* Untested Portion Begin */
+
+        /** Acceleration Limiting Start */
+
         Translation2d curVel = swerveSubsystem.getState().velocityXY();
         Translation2d desiredAcceleration = desiredTranslation.minus(curVel);
         double accelerationLimit = SwerveConstants.MAX_ACCELERATION.in(MetersPerSecondPerSecond) * (1 - curVel.getNorm() / SwerveConstants.MAX_VELOCITY.in(MetersPerSecond));
@@ -134,6 +135,23 @@ public class TeleopSwerve extends Command {
 
         double maxSkidAcceleration = Math.max(1, desiredAcceleration.getNorm() / SwerveConstants.MAX_ACCELERATION_SKID.in(MetersPerSecondPerSecond));
         desiredAcceleration = desiredAcceleration.div(desiredAcceleration.getNorm()).times(maxSkidAcceleration);
+
+        /** Acceleration Limiting End */
+        
+        /** Jerk Limiting Start */
+        /** Might do Questionable Things because we are using our currentAcceleration which may not be accurate (Why it is in the untested Portion)  */
+
+        Translation2d curAccel = swerveSubsystem.getState().accelerationXY();
+        Translation2d desiredJerk = desiredAcceleration.minus(curAccel);
+        double jerkLimit = SwerveConstants.MAX_JERK.in(MetersPerSecondPerSecond.per(Seconds));
+        
+        double jerkScaling = Math.min(jerkLimit, desiredJerk.getNorm());
+
+        Translation2d scaledJerk = desiredJerk.div(desiredJerk.getNorm()).times(jerkScaling);
+
+        desiredAcceleration = curAccel.plus(scaledJerk);
+        
+        /** Jerk Limiting End */
 
         desiredTranslation = curVel.plus(desiredAcceleration);
         /* Untested Portion End */

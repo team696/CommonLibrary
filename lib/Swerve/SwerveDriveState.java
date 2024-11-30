@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class SwerveDriveState {
     public Pose2d pose;
     public ChassisSpeeds robotRelativeSpeeds;
+    public ChassisSpeeds robotAcceleration = new ChassisSpeeds();
     public double timeStamp;
     public double timeSinceLastUpdate;
 
@@ -42,16 +43,20 @@ public class SwerveDriveState {
      * 
      * @return Current X,Y velocity of the robot in M/S
      */
-    public double velocity() {
+    public double speed() {
         return Math.sqrt(robotRelativeSpeeds.vxMetersPerSecond * robotRelativeSpeeds.vxMetersPerSecond + robotRelativeSpeeds.vyMetersPerSecond * robotRelativeSpeeds.vyMetersPerSecond);
     }
 
-    /*
+    /**
      * 
-     * 
+     * @return Current X,Y velocity of robot in M/S as a Vector
      */
     public Translation2d velocityXY() {
         return new Translation2d(robotRelativeSpeeds.vxMetersPerSecond, robotRelativeSpeeds.vyMetersPerSecond);
+    }
+
+    public Translation2d accelerationXY() {
+        return new Translation2d(robotAcceleration.vxMetersPerSecond, robotAcceleration.vyMetersPerSecond);
     }
 
     /**
@@ -72,6 +77,10 @@ public class SwerveDriveState {
      */
     public SwerveDriveState update(Pose2d pose, ChassisSpeeds speeds, double time) {
         this.timeSinceLastUpdate = time - this.timeStamp;
+        if (timeSinceLastUpdate == 0) timeSinceLastUpdate = 1e-6;
+        this.robotAcceleration.vxMetersPerSecond = (speeds.vxMetersPerSecond - this.robotRelativeSpeeds.vxMetersPerSecond) / this.timeSinceLastUpdate;
+        this.robotAcceleration.vyMetersPerSecond = (speeds.vyMetersPerSecond - this.robotRelativeSpeeds.vyMetersPerSecond) / this.timeSinceLastUpdate;
+        this.robotAcceleration.omegaRadiansPerSecond = (speeds.omegaRadiansPerSecond - this.robotRelativeSpeeds.omegaRadiansPerSecond) / this.timeSinceLastUpdate;
 
         this.pose = pose;
         this.robotRelativeSpeeds = speeds;
@@ -89,3 +98,12 @@ public class SwerveDriveState {
         updatePublisher.set(this.timeSinceLastUpdate);
     }
 }
+ 
+
+/**
+ *  Potential Future work -> Incorporate Gyro Readings into Current Acceleration and Store Jerk, Might be cool
+ *
+ *  Add system for keeping track of confidence of current pose (1690). Overtime accumulate error from odometry -> reset down when getting vision readings ect.
+ * 
+ * Will help update vision faster and more reliably, don't need to trust shit vision poses when we have gotten a good one and barely moved! 
+ */

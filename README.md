@@ -3,6 +3,7 @@
 ## Usage: 
 
 ### Automatic Install
+ - Initialize git for your project (you don't actually need to make a github page, just press the button on the left side in VS Code called Source Control)
  - Go To Root of your project (one with the src folder and gradle files) 
  - Run
 ``` 

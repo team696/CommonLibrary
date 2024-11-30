@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +22,7 @@ import edu.wpi.first.units.LinearAccelerationUnit;
 import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.MassUnit;
 import edu.wpi.first.units.MultUnit;
+import edu.wpi.first.units.TimeUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -87,6 +89,11 @@ public class SwerveConstants {
 		public static final LinearAcceleration MAX_ACCELERATION_Y =    MetersPerSecondPerSecond.of(10000000);
 		public static final LinearAcceleration MAX_ACCELERATION_SKID = MetersPerSecondPerSecond.of(10000000); 
 		
+		/**
+		 * 	Jerk Control - My Own
+		 */
+		public static final Per<LinearAccelerationUnit, TimeUnit> MAX_JERK = MetersPerSecondPerSecond.per(Seconds).ofNative(100000000);
+
 		//ASSUMES UNIFORM DISTRIBUTION, SHOULD BE CALCULATED EXPERIMENTALLY
 		public static final Mult<MultUnit<MassUnit, DistanceUnit>, DistanceUnit> THEORETICAL_MOMENT_OF_INERTIA = MASS.times(DRIVEBASE_RADIUS).times(DRIVEBASE_RADIUS).times(1/12);
 
