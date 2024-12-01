@@ -1,7 +1,7 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
+/* 
 package frc.team696.lib.Logging;
 
 import org.littletonrobotics.junction.Logger;
@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.BuildConstants;
 
-/** Simple Setup for Advantage Kit */
+/** Simple Setup for Advantage Kit */ /* 
 @SuppressWarnings("resource")
 public class AdvantageKitLog {
     public static final void setup() {
@@ -43,3 +43,4 @@ public class AdvantageKitLog {
         Logger.start();
     }
 }
+*/

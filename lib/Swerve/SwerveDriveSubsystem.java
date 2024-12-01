@@ -46,12 +46,6 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
 
     private SwerveModuleState[] swerveModuleDesiredStates = {new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
 
-    private final StructArrayPublisher<SwerveModuleState> swerveModuleDesiredStatePublisher = NetworkTableInstance.getDefault()
-.getStructArrayTopic("696/Swerve/DesiredStates", SwerveModuleState.struct).publish();
-
-    private final StructArrayPublisher<SwerveModuleState> swerveModuleStatePublisher = NetworkTableInstance.getDefault()
-.getStructArrayTopic("696/Swerve/MeasuredStates", SwerveModuleState.struct).publish();
-
     public SwerveDriveSubsystem() {
         this._stateLock = new ReentrantReadWriteLock();
         this._cachedState = new SwerveDriveState();
@@ -326,11 +320,13 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
             this.updateYawOffset();
         }
 
-        swerveModuleStatePublisher.set(getModuleStates());
+        Logger.recordOutput("ModuleStates", SwerveModuleState.struct, getModuleStates());
       
-        swerveModuleDesiredStatePublisher.set(swerveModuleDesiredStates);
+        Logger.recordOutput("DesiredModuleStates", SwerveModuleState.struct, swerveModuleDesiredStates);
 
         Logger.recordOutput("Slippage", _kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond - _pigeon.getAngularVelocity() * Math.PI/180);
+
+        Logger.recordOutput("RobotState", SwerveDriveState.struct, getState());
 
         onUpdate();
     }
@@ -362,7 +358,8 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
 
             this.setName("OdometryThread");
             this.setDaemon(true);
-            this.setPriority(MIN_PRIORITY);
+            // Slightly Above Minimum
+            this.setPriority(MIN_PRIORITY + 1);
         }
 
         public void run() {

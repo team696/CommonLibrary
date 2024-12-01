@@ -4,30 +4,37 @@
 
 package frc.team696.lib.Swerve;
 
-import org.littletonrobotics.junction.Logger;
+import java.nio.ByteBuffer;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructSerializable;
 
 /** 
  * Holds the current State of the robot and last update.
  * 
  * <p> Should Not be manually updated
  */
-public class SwerveDriveState {
+public class SwerveDriveState implements StructSerializable {
     public Pose2d pose;
     public ChassisSpeeds robotRelativeSpeeds;
     public ChassisSpeeds robotAcceleration = new ChassisSpeeds();
     public double timeStamp;
     public double timeSinceLastUpdate;
 
-    private final static DoublePublisher updatePublisher = NetworkTableInstance.getDefault().getDoubleTopic("696/RobotState/loopTime").publish();
-
     public SwerveDriveState(Pose2d pose, ChassisSpeeds speeds, double time) {
         update(pose, speeds, time);
+    }
+
+    public SwerveDriveState(Pose2d pose, ChassisSpeeds speeds, ChassisSpeeds acceleration, double time, double timeSinceLastUpdate) {
+        this.pose = pose;
+        this.robotRelativeSpeeds = speeds;
+        this.robotAcceleration = acceleration;
+        this.timeStamp = time;
+        this.timeSinceLastUpdate = timeSinceLastUpdate;
     }
 
     public SwerveDriveState(SwerveDriveState other) {
@@ -89,13 +96,56 @@ public class SwerveDriveState {
         return this;
     }
 
-    /**
-     * Logs the state of the robot 
-     */
-    public void publish() {
-        Logger.recordOutput("Pose", this.pose);
-        Logger.recordOutput("Speeds", this.robotRelativeSpeeds);
-        updatePublisher.set(this.timeSinceLastUpdate);
+    public static final SwerveDriveStateStruct struct = new SwerveDriveStateStruct();
+    public static class SwerveDriveStateStruct implements Struct<SwerveDriveState> {
+    @Override
+    public Class<SwerveDriveState> getTypeClass() {
+        return SwerveDriveState.class;
+    }
+
+    @Override
+    public String getTypeName() {
+        return "SwerveDriveState";
+    }
+
+    @Override
+    public int getSize() {
+        return Pose2d.struct.getSize() + ChassisSpeeds.struct.getSize() + ChassisSpeeds.struct.getSize() + Double.BYTES + Double.BYTES;
+    }
+
+    @Override
+    public String getSchema() {
+        return "Pose2d pose;ChassisSpeeds velocity;ChassisSpeeds acceleration;Double timestamp;Double timeSinceLastUpdate";
+    }
+
+    @Override
+    public Struct<?>[] getNested() {
+        return new Struct<?>[] {Translation2d.struct, Rotation2d.struct};
+    }
+
+    @Override
+    public SwerveDriveState unpack(ByteBuffer bb) {
+        Pose2d pose = Pose2d.struct.unpack(bb);
+        ChassisSpeeds velocity = ChassisSpeeds.struct.unpack(bb);
+        ChassisSpeeds acceleration = ChassisSpeeds.struct.unpack(bb);
+        double time = bb.getDouble();
+        double timeSinceLastUpdate = bb.getDouble();
+        return new SwerveDriveState(pose, velocity, acceleration, time, timeSinceLastUpdate);
+    }
+
+    @Override
+    public void pack(ByteBuffer bb, SwerveDriveState value) {
+        Pose2d.struct.pack(bb, value.pose);
+        ChassisSpeeds.struct.pack(bb, value.robotRelativeSpeeds);
+        ChassisSpeeds.struct.pack(bb, value.robotAcceleration);
+        bb.putDouble(value.timeStamp);
+        bb.putDouble(value.timeSinceLastUpdate);
+    }
+
+    @Override
+    public boolean isImmutable() {
+        return true;
+    }
     }
 }
  
