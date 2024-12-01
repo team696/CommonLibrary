@@ -2,12 +2,11 @@ package frc.team696.lib.Camera;
 
 import java.util.Optional;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N3;
+import frc.team696.lib.Logging.BackupLogger;
 import frc.team696.lib.Logging.PLog;
 
 /** Base Camera Object for handling how cameras will generally be handled
@@ -61,10 +60,10 @@ public abstract class BaseCam {
             AprilTagResult estimation = oEstimation.get();
             try {
                 if (!checkEstimation.test(estimation)) {
-                    Logger.recordOutput("696/Vision/Rejected Pose", estimation.pose);
+                    BackupLogger.addToQueue("696/Vision/Rejected Pose", estimation.pose);
                     return false;
                 } else {
-                    Logger.recordOutput("696/Vision/Accepted Pose", estimation.pose);
+                    BackupLogger.addToQueue("696/Vision/Accepted Pose", estimation.pose);
                 }
             } catch (Exception e) {
                 PLog.fatalException("Camera", e.getMessage(), e);

@@ -3,8 +3,6 @@ package frc.team696.lib.Swerve;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 
 import edu.wpi.first.math.VecBuilder;
@@ -18,8 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -27,6 +23,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team696.lib.Util;
 import frc.team696.lib.HardwareDevices.PigeonFactory;
+import frc.team696.lib.Logging.BackupLogger;
 
 public abstract class SwerveDriveSubsystem extends SubsystemBase {
     private final SwerveModulePosition[] _swervePositions = new SwerveModulePosition[4];
@@ -320,13 +317,13 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
             this.updateYawOffset();
         }
 
-        Logger.recordOutput("ModuleStates", SwerveModuleState.struct, getModuleStates());
+        BackupLogger.addToQueue("Swerve/ModuleStates", getModuleStates());
       
-        Logger.recordOutput("DesiredModuleStates", SwerveModuleState.struct, swerveModuleDesiredStates);
+        BackupLogger.addToQueue("Swerve/DesiredModuleStates", swerveModuleDesiredStates);
 
-        Logger.recordOutput("Slippage", _kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond - _pigeon.getAngularVelocity() * Math.PI/180);
+        BackupLogger.addToQueue("Swerve/Slippage", _kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond - _pigeon.getAngularVelocity() * Math.PI/180);
 
-        Logger.recordOutput("RobotState", SwerveDriveState.struct, getState());
+        BackupLogger.addToQueue("Swerve/RobotState", getState());
 
         onUpdate();
     }

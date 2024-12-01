@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -37,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team696.lib.Dashboards.ShuffleDashboard;
+import frc.team696.lib.Logging.BackupLogger;
 import frc.team696.lib.Logging.PLog;
 import frc.team696.lib.Swerve.SwerveConfigs;
 import frc.team696.lib.Swerve.SwerveConstants;
@@ -123,7 +122,7 @@ public class Auto {
         }
 
         PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
-            Logger.recordOutput("696/Auto/Desired", pose);
+            BackupLogger.addToQueue("696/Auto/Desired", pose);
         });
 
         PathPlannerLogging.setLogActivePathCallback((poses) -> {

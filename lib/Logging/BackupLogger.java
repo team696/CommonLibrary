@@ -122,14 +122,14 @@ public class BackupLogger {
                     if (BackupLogger.PUBLISH_TO_NT) {
                         Method[] methodsNT = LogEntry.publishers.get(entry.name).publisher.getClass().getMethods();
                         for (Method method : methodsNT) {
-                            if (method.getName().equals("accept") && method.getParameterCount() == 1)
+                            if (method.getName().equals("accept") && method.getParameterCount() == 1 && ((method.getParameterTypes()[0].isArray() && entry.value.getClass().isArray()) || !entry.value.getClass().isArray()))
                                 method.invoke( LogEntry.publishers.get(entry.name).publisher, entry.value);
                         }
                     }
                     if (BackupLogger.PUBLISH_TO_LOG) {
                         Method[] methodsLOG = LogEntry.logEntries.get(entry.name).dataLog.getClass().getMethods();
                         for (Method method : methodsLOG) {
-                            if (method.getName().equals("update") && method.getParameterCount() == 1)
+                            if (method.getName().equals("update") && method.getParameterCount() == 1 && ((method.getParameterTypes()[0].isArray() && entry.value.getClass().isArray()) || !entry.value.getClass().isArray()))
                                 method.invoke( LogEntry.logEntries.get(entry.name).dataLog, entry.value);
                         }
                     }

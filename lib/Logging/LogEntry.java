@@ -98,7 +98,7 @@ public class LogEntry<T> {
 
         if(value instanceof StructSerializable[]) {
             try {
-                Struct<?> structImplementation = (Struct<?>)value.getClass().arrayType().getDeclaredField("struct").get(null);
+                Struct<?> structImplementation = (Struct<?>)value.getClass().getComponentType().getDeclaredField("struct").get(null);
                 publishers.put(name, new GenericPublisher<>(NetworkTableInstance.getDefault().getStructArrayTopic(name, structImplementation).publish()));
             
                 logEntries.put(name, new GenericDataLog<DataLogEntry>(StructArrayLogEntry.create(BackupLogger.log, name, structImplementation)));

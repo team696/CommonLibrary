@@ -19,11 +19,11 @@ import edu.wpi.first.util.struct.StructSerializable;
  * <p> Should Not be manually updated
  */
 public class SwerveDriveState implements StructSerializable {
-    public Pose2d pose;
-    public ChassisSpeeds robotRelativeSpeeds;
+    public Pose2d pose = new Pose2d();
+    public ChassisSpeeds robotRelativeSpeeds = new ChassisSpeeds();
     public ChassisSpeeds robotAcceleration = new ChassisSpeeds();
-    public double timeStamp;
-    public double timeSinceLastUpdate;
+    public double timeStamp = 0;
+    public double timeSinceLastUpdate = -1;
 
     public SwerveDriveState(Pose2d pose, ChassisSpeeds speeds, double time) {
         update(pose, speeds, time);
@@ -115,12 +115,12 @@ public class SwerveDriveState implements StructSerializable {
 
     @Override
     public String getSchema() {
-        return "Pose2d pose;ChassisSpeeds velocity;ChassisSpeeds acceleration;Double timestamp;Double timeSinceLastUpdate";
+        return "Pose2d pose;ChassisSpeeds velocity;ChassisSpeeds acceleration;double timestamp;double timeSinceLastUpdate";
     }
 
     @Override
     public Struct<?>[] getNested() {
-        return new Struct<?>[] {Translation2d.struct, Rotation2d.struct};
+        return new Struct<?>[] {Pose2d.struct, ChassisSpeeds.struct};
     }
 
     @Override

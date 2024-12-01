@@ -21,7 +21,7 @@ Easily Install Through WPILIB Vendor Dependencies Tab (New for 2025)
 
 * Phoenix 6
 * Path Planner
-* Advantage Kit
+* Advantage Kit (Recommended for logging, though optional)
     - Follow Instructions on [Advantage Kit Docs](https://docs.advantagekit.org/installation/)
         - Must Also Install [Version Control Section](https://docs.advantagekit.org/installation/version-control)
 * Photonvision (If Needed)
