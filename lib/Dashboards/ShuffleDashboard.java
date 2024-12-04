@@ -11,7 +11,7 @@ public class ShuffleDashboard {
 
     public static final Field2d field = new Field2d();
 
-    public final static void initialize() {
+    static {
         _mainTab = Shuffleboard.getTab("Telemetry");
 
         _mainTab.add(field).withPosition(0, 0).withSize(7, 6);

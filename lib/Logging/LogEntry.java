@@ -5,7 +5,6 @@
 package frc.team696.lib.Logging;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 import edu.wpi.first.networktables.NetworkTableInstance;

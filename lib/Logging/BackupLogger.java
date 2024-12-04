@@ -36,7 +36,9 @@ public class BackupLogger {
     private static final CANStatus status = new CANStatus();
     private static PowerDistribution pdh;
 
-    public static final void start() {
+    private static logThread lThread;
+
+    static {
         DataLogManager.start();
 
         log = DataLogManager.getLog();
@@ -45,8 +47,22 @@ public class BackupLogger {
         DataLogManager.logNetworkTables(true);
         DriverStation.startDataLog(log, true);
 
-        new logThread().start();
+        lThread = new logThread();
+        lThread.start();
     }
+
+    public static void stop() {
+        lThread.isRunning = false;
+        DataLogManager.stop();
+
+        for (LogEntry.GenericPublisher<?> p : LogEntry.publishers.values()) {
+            p.publisher.close();
+        }
+
+        for (LogEntry.GenericDataLog<?> p : LogEntry.logEntries.values()) {
+            p.dataLog.finish();
+        }
+    } 
 
     public static void setPdh(PowerDistribution newPdh) {
         pdh = newPdh;
@@ -103,7 +119,8 @@ public class BackupLogger {
     }
 
     public static <T> void addToQueue(String name, T value) {
-        logQueue.add(new LogEntry<T>(name, value));
+        if (lThread.isRunning)
+            logQueue.add(new LogEntry<T>(name, value));
     }
 
     public static class logThread extends Thread {
@@ -112,9 +129,10 @@ public class BackupLogger {
             this.setDaemon(true);
             this.setPriority(MIN_PRIORITY);
         } 
+        public volatile boolean isRunning = true;
         @Override
         public void run() {
-            while (true) {
+            while (isRunning) {
                 LogEntry<?> entry = BackupLogger.logQueue.poll();
                 if (entry == null) continue;
                 try {

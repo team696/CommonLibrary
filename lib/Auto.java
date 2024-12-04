@@ -45,6 +45,7 @@ import frc.team696.lib.Swerve.SwerveModule;
 /**
  * Houses all methods related to the Autonomous period and self driving during teleop
  */
+@SuppressWarnings("resource")
 public class Auto {
     /**
      * Wrapper For Pathplanners NamedCommand System
