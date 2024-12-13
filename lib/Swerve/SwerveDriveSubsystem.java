@@ -1,5 +1,7 @@
 package frc.team696.lib.Swerve;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -321,8 +323,6 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
       
         BackupLogger.addToQueue("Swerve/DesiredModuleStates", swerveModuleDesiredStates);
 
-        BackupLogger.addToQueue("Swerve/Slippage", _kinematics.toChassisSpeeds(getModuleStates()).omegaRadiansPerSecond - _pigeon.getAngularVelocity() * Math.PI/180);
-
         BackupLogger.addToQueue("Swerve/RobotState", getState());
 
         onUpdate();
@@ -355,12 +355,11 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
 
             this.setName("OdometryThread");
             this.setDaemon(true);
-            // Slightly Above Minimum
-            this.setPriority(MIN_PRIORITY + 1);
+            this.setPriority(MIN_PRIORITY + 1); // Slightly Above Minimum
         }
 
         public void run() {
-            _allSignals = new BaseStatusSignal[this0._modules.length * SwerveModule.SIGNAL_COUNT + 2];
+            _allSignals = new BaseStatusSignal[this0._modules.length * SwerveModule.SIGNAL_COUNT + 2 + 3];
             for (SwerveModule mod : this0._modules) {
 
                 BaseStatusSignal[] signals = mod.getSignals();
@@ -372,7 +371,12 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
             _allSignals[_allSignals.length - 2] = this0._pigeon._yawSignal;
             _allSignals[_allSignals.length - 1] = this0._pigeon._yawVelocitySignal;
 
+            _allSignals[_allSignals.length - 5] = this0._pigeon.get().getAccelerationX();
+            _allSignals[_allSignals.length - 4] = this0._pigeon.get().getAccelerationY();
+            _allSignals[_allSignals.length - 3] = this0._pigeon.get().getAccelerationZ();
+
             BaseStatusSignal.setUpdateFrequencyForAll(250, _allSignals);
+            ChassisSpeeds acceleration = new ChassisSpeeds();
 
             while (true) {
                 try {
@@ -387,18 +391,35 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
                     ChassisSpeeds speeds = _kinematics.toChassisSpeeds(getModuleStates());
 
                     double time = System.currentTimeMillis();
+                    double timeSinceLastUpdate = time - _cachedState.timeStamp;
+                    if (timeSinceLastUpdate == 0) timeSinceLastUpdate = 1e-9;
 
                     Pose2d newPose = _poseEstimator.update(latencyAdjustedYaw(), _swervePositions);
+
+                    double slippage = Math.abs(speeds.omegaRadiansPerSecond - _pigeon.getAngularVelocity().in(RadiansPerSecond)) * Math.sqrt(speeds.vxMetersPerSecond * speeds.vxMetersPerSecond + speeds.vyMetersPerSecond * speeds.vyMetersPerSecond);
+
+                    double measuredSensorAcceleration = Math.sqrt(Math.pow(_allSignals[_allSignals.length - 3].getValueAsDouble(),2) + Math.pow(_allSignals[_allSignals.length - 4].getValueAsDouble(),2) + Math.pow(_allSignals[_allSignals.length - 5].getValueAsDouble(),2) );
+
+                    acceleration.vxMetersPerSecond = (speeds.vxMetersPerSecond - _cachedState.robotRelativeSpeeds.vxMetersPerSecond) / (timeSinceLastUpdate / 1000);
+                    acceleration.vyMetersPerSecond = (speeds.vyMetersPerSecond - _cachedState.robotRelativeSpeeds.vyMetersPerSecond) / (timeSinceLastUpdate / 1000);
+                    acceleration.omegaRadiansPerSecond = (speeds.omegaRadiansPerSecond - _cachedState.robotRelativeSpeeds.omegaRadiansPerSecond) / (timeSinceLastUpdate / 1000);
+
+                    double accelerationMagnitude = acceleration.vxMetersPerSecond * acceleration.vxMetersPerSecond + acceleration.vyMetersPerSecond * acceleration.vyMetersPerSecond;
+
+                    BackupLogger.addToQueue("sensorAcceleration",measuredSensorAcceleration - 1);
+                    BackupLogger.addToQueue("acceleration",accelerationMagnitude);
 
                     this.this0._cachedState.update(
                         newPose,
                         speeds,
-                        time
+                        acceleration,
+                        time,
+                        slippage
                     );
                 } finally {
                     this.this0._stateLock.writeLock().unlock();
                 }
-                Timer.delay(1.0/250.0); //Limits To 250 Hz
+                Timer.delay(1.0/250.0); //Limits To 250 Hz 
             }
         }
     }

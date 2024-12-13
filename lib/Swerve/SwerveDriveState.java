@@ -24,25 +24,29 @@ public class SwerveDriveState implements StructSerializable {
     public double timeStamp = 0;
     public double timeSinceLastUpdate = -1;
 
-    public SwerveDriveState(Pose2d pose, ChassisSpeeds speeds, double time) {
-        update(pose, speeds, time);
+    /** Use This to Scale trust of camera measurements, decreasing it as you get updates, up to you how you want to change it. */
+    public double trust = 1e-9; // Never Set To 0
+
+    public SwerveDriveState(Pose2d pose, ChassisSpeeds speeds, ChassisSpeeds accelerations, double time, double trust) {
+        update(pose, speeds, accelerations, time, trust);
     }
 
-    public SwerveDriveState(Pose2d pose, ChassisSpeeds speeds, ChassisSpeeds acceleration, double time, double timeSinceLastUpdate) {
+    public SwerveDriveState(Pose2d pose, ChassisSpeeds speeds, ChassisSpeeds acceleration, double time, double timeSinceLastUpdate, double trust) {
         this.pose = pose;
         this.robotRelativeSpeeds = speeds;
         this.robotAcceleration = acceleration;
         this.timeStamp = time;
         this.timeSinceLastUpdate = timeSinceLastUpdate;
+        this.trust = trust;
     }
 
     public SwerveDriveState(SwerveDriveState other) {
-        this(other.pose, other.robotRelativeSpeeds, other.timeStamp);
+        this(other.pose, other.robotRelativeSpeeds, other.robotAcceleration, other.timeStamp, other.trust);
         this.timeSinceLastUpdate = other.timeSinceLastUpdate;
     }
 
     public SwerveDriveState() {
-        this(new Pose2d(), new ChassisSpeeds(), 0);
+        this(new Pose2d(), new ChassisSpeeds(), new ChassisSpeeds(), 0, 1e-9);
     }
 
     /**
@@ -81,16 +85,16 @@ public class SwerveDriveState implements StructSerializable {
      * @param time
      * @return
      */
-    public SwerveDriveState update(Pose2d pose, ChassisSpeeds speeds, double time) {
+    public SwerveDriveState update(Pose2d pose, ChassisSpeeds speeds, ChassisSpeeds accelerations, double time, double slippage) {
         this.timeSinceLastUpdate = time - this.timeStamp;
         if (timeSinceLastUpdate == 0) timeSinceLastUpdate = 1e-6;
-        this.robotAcceleration.vxMetersPerSecond = (speeds.vxMetersPerSecond - this.robotRelativeSpeeds.vxMetersPerSecond) / this.timeSinceLastUpdate;
-        this.robotAcceleration.vyMetersPerSecond = (speeds.vyMetersPerSecond - this.robotRelativeSpeeds.vyMetersPerSecond) / this.timeSinceLastUpdate;
-        this.robotAcceleration.omegaRadiansPerSecond = (speeds.omegaRadiansPerSecond - this.robotRelativeSpeeds.omegaRadiansPerSecond) / this.timeSinceLastUpdate;
 
         this.pose = pose;
         this.robotRelativeSpeeds = speeds;
+        this.robotAcceleration = accelerations;
         this.timeStamp = time;
+
+        this.trust += slippage;
 
         return this;
     }
@@ -109,12 +113,12 @@ public class SwerveDriveState implements StructSerializable {
 
     @Override
     public int getSize() {
-        return Pose2d.struct.getSize() + ChassisSpeeds.struct.getSize() + ChassisSpeeds.struct.getSize() + Double.BYTES + Double.BYTES;
+        return Pose2d.struct.getSize() + ChassisSpeeds.struct.getSize() + ChassisSpeeds.struct.getSize() + Double.BYTES * 3;
     }
 
     @Override
     public String getSchema() {
-        return "Pose2d pose;ChassisSpeeds velocity;ChassisSpeeds acceleration;double timestamp;double timeSinceLastUpdate";
+        return "Pose2d pose;ChassisSpeeds velocity;ChassisSpeeds acceleration;double timestamp;double timeSinceLastUpdate;double trust";
     }
 
     @Override
@@ -129,7 +133,8 @@ public class SwerveDriveState implements StructSerializable {
         ChassisSpeeds acceleration = ChassisSpeeds.struct.unpack(bb);
         double time = bb.getDouble();
         double timeSinceLastUpdate = bb.getDouble();
-        return new SwerveDriveState(pose, velocity, acceleration, time, timeSinceLastUpdate);
+        double trust = bb.getDouble();
+        return new SwerveDriveState(pose, velocity, acceleration, time, timeSinceLastUpdate, trust);
     }
 
     @Override
@@ -139,6 +144,7 @@ public class SwerveDriveState implements StructSerializable {
         ChassisSpeeds.struct.pack(bb, value.robotAcceleration);
         bb.putDouble(value.timeStamp);
         bb.putDouble(value.timeSinceLastUpdate);
+        bb.putDouble(value.trust);
     }
 
     @Override

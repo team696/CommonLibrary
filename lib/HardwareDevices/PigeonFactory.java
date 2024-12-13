@@ -1,5 +1,7 @@
 package frc.team696.lib.HardwareDevices;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -112,22 +114,22 @@ public class PigeonFactory implements GyroInterface {
         _gyro.reset();
     }
 
-    public double getAngularVelocity(boolean refresh) {
+    public AngularVelocity getAngularVelocity(boolean refresh) {
         if (configure()) {
             if (refresh) {
                 StatusSignal<AngularVelocity> code = _yawVelocitySignal.refresh();
                 if(!code.getStatus().isOK()) {
                     _configured = false;
-                    return 0;
+                    return RadiansPerSecond.of(0);
                 }
             }
-            return _yawVelocitySignal.getValueAsDouble();
+            return _yawVelocitySignal.getValue();
         } else 
-            return 0;
+            return RadiansPerSecond.of(0);
     }
 
     @Override
-    public double getAngularVelocity() {
+    public AngularVelocity getAngularVelocity() {
         return getAngularVelocity(false);
     }
 

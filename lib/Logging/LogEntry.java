@@ -157,7 +157,7 @@ public class LogEntry<T> {
 
             Method[] methodsNT = publisher.getClass().getMethods();
             for (Method method : methodsNT) {
-                if (method.getName().equals("accept") && method.getParameterCount() == 1) {
+                if (method.getName().equals("set") && method.getParameterCount() == 1) {
                     if (method.getParameterTypes()[0].isArray() != type.isArray()) continue;
                     
                     classToPublisher.put(type, method);
