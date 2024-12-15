@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -406,7 +407,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
 
                     double accelerationMagnitude = acceleration.vxMetersPerSecond * acceleration.vxMetersPerSecond + acceleration.vyMetersPerSecond * acceleration.vyMetersPerSecond;
 
-                    BackupLogger.addToQueue("sensorAcceleration",measuredSensorAcceleration - 1);
+                    BackupLogger.addToQueue("sensorAcceleration", Units.Gs.of(measuredSensorAcceleration - 1).in(Units.MetersPerSecondPerSecond));
                     BackupLogger.addToQueue("acceleration",accelerationMagnitude);
 
                     this.this0._cachedState.update(
