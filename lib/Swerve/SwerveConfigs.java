@@ -3,7 +3,6 @@ package frc.team696.lib.Swerve;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -37,7 +36,7 @@ public final class SwerveConfigs {
                 
                 /** Swerve CANCoder Configuration */
                 canCoder.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-                canCoder.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+                canCoder.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
                 /** Swerve Angle Motor Configuration */
                 angle.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -81,25 +80,25 @@ public final class SwerveConfigs {
                 drive.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
                 /** Individual Swerve Module Configurations */ 
-                FRONT_LEFT.CANcoderId = 1;  
-                FRONT_LEFT.DriveMotorId = 1; 
-                FRONT_LEFT.SteerMotorId = 2;
-                FRONT_LEFT.CANcoderOffset = -0.;
+                FRONT_LEFT.CANcoderId = 0;  
+                FRONT_LEFT.DriveMotorId = 3; 
+                FRONT_LEFT.SteerMotorId = 6;
+                FRONT_LEFT.CANcoderOffset = -0.313;
+        
+                FRONT_RIGHT.CANcoderId = 3; 
+                FRONT_RIGHT.DriveMotorId = 4;
+                FRONT_RIGHT.SteerMotorId = 7;
+                FRONT_RIGHT.CANcoderOffset = 0.272;
 
-                FRONT_RIGHT.CANcoderId = 2; 
-                FRONT_RIGHT.DriveMotorId = 3;
-                FRONT_RIGHT.SteerMotorId = 4;
-                FRONT_RIGHT.CANcoderOffset = 0.;
+                BACK_LEFT.CANcoderId = 2; 
+                BACK_LEFT.DriveMotorId = 2;
+                BACK_LEFT.SteerMotorId = 1;
+                BACK_LEFT.CANcoderOffset = 0.372;
 
-                BACK_LEFT.CANcoderId = 3; 
-                BACK_LEFT.DriveMotorId = 5;
-                BACK_LEFT.SteerMotorId = 6;
-                BACK_LEFT.CANcoderOffset = 0.;
-
-                BACK_RIGHT.CANcoderId = 4; 
-                BACK_RIGHT.DriveMotorId = 7;
-                BACK_RIGHT.SteerMotorId = 8;
-                BACK_RIGHT.CANcoderOffset = 0.;
+                BACK_RIGHT.CANcoderId = 1; 
+                BACK_RIGHT.DriveMotorId = 5;
+                BACK_RIGHT.SteerMotorId = 0;
+                BACK_RIGHT.CANcoderOffset = 0.359;
 
                 /** Pigeon Configuration */ 
                 pigeon.MountPose.MountPoseYaw = 0;

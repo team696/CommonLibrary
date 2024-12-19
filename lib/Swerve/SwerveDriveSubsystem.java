@@ -205,9 +205,9 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
      */
     public void Drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         ChassisSpeeds desiredRobotSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation) ;
-        
         if (fieldRelative)
-            desiredRobotSpeeds.toFieldRelativeSpeeds(getYaw().plus(yawOffset).rotateBy(Rotation2d.fromDegrees( (Util.getAlliance() == Alliance.Red ? 180 : 0) )));
+            desiredRobotSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(desiredRobotSpeeds, getYaw().plus(yawOffset).rotateBy(Rotation2d.fromDegrees( (Util.getAlliance() == Alliance.Red ? 180 : 0) )));
+
 
         SwerveModuleState[] swerveModuleStates = _kinematics.toSwerveModuleStates(desiredRobotSpeeds);
                         

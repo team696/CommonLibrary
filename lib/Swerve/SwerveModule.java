@@ -110,7 +110,7 @@ public class SwerveModule{
             _driveMotor.VoltageOut(Volts.of(desiredState.speedMetersPerSecond / SwerveConstants.MAX_VELOCITY.in(Units.MetersPerSecond)*12));
         } else {
             _driveVelocity.Velocity = Util.MPSToRPS(desiredState.speedMetersPerSecond, SwerveConstants.WHEEL_CIRCUM.in(Units.Meters));
-            _driveVelocity.FeedForward = _driveFeedForward.calculate(Units.MetersPerSecond.of(desiredState.speedMetersPerSecond)).magnitude();
+            _driveVelocity.FeedForward = _driveFeedForward.calculate(desiredState.speedMetersPerSecond);
             _driveMotor.setControl(_driveVelocity);
         }
     }
