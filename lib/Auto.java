@@ -88,8 +88,7 @@ public class Auto {
                 DCMotor.getKrakenX60(1), 
                 Amps.of(SwerveConfigs.drive.CurrentLimits.StatorCurrentLimit), 
                 1), 
-            SwerveConstants.WHEELBASE_X.times(2),
-            SwerveConstants.WHEELBASE_Y.times(2));
+            SwerveConstants.modPositions);
         if (shouldUseGUIValues) { 
             try{
                 config = RobotConfig.fromGUISettings();

@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.team696.lib.Util;
 import frc.team696.lib.Swerve.SwerveConstants;
@@ -29,6 +30,7 @@ public class TeleopSwerve extends Command {
     protected static double deadband = 1; // deadband for controller -> defaulted to 1 so you must config swerve
     protected static double rotationDeadband = 1;
     protected static SwerveDriveSubsystem swerveSubsystem = null;
+    protected static double lastPeriodicSeconds = 0;
     private static PIDController pidController = new PIDController(0.0056, 0.00, 0); 
     static {
         pidController.enableContinuousInput(-180, 180);
@@ -120,12 +122,12 @@ public class TeleopSwerve extends Command {
         double desiredRotation = rAxis * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RotationsPerSecond);
         Translation2d desiredTranslation = new Translation2d(Math.pow(magnitude, 2), theta).times(SwerveConstants.MAX_VELOCITY.in(MetersPerSecond)).times(outputPercent);
 
-        /* Untested Portion Begin */
+        /* Untested Portion Begin 
+        double deltaSeconds = Timer.getFPGATimestamp() - lastPeriodicSeconds;
 
-        /** Acceleration Limiting Start */
-
+        // Acceleration Limiting Start 
         Translation2d curVel = swerveSubsystem.getState().velocityXY();
-        Translation2d desiredAcceleration = desiredTranslation.minus(curVel);
+        Translation2d desiredAcceleration = desiredTranslation.minus(curVel).div(deltaSeconds);
         double accelerationLimit = SwerveConstants.MAX_ACCELERATION.in(MetersPerSecondPerSecond) * (1 - curVel.getNorm() / SwerveConstants.MAX_VELOCITY.in(MetersPerSecond));
 
         desiredAcceleration = desiredAcceleration.div(desiredAcceleration.getNorm()).times(accelerationLimit);
@@ -136,26 +138,29 @@ public class TeleopSwerve extends Command {
         double maxSkidAcceleration = Math.max(1, desiredAcceleration.getNorm() / SwerveConstants.MAX_ACCELERATION_SKID.in(MetersPerSecondPerSecond));
         desiredAcceleration = desiredAcceleration.div(desiredAcceleration.getNorm()).times(maxSkidAcceleration);
 
-        /** Acceleration Limiting End */
+        // Acceleration Limiting End 
         
-        /** Jerk Limiting Start */
-        /** Might do Questionable Things because we are using our currentAcceleration which may not be accurate (Why it is in the untested Portion)  */
+        // Jerk Limiting Start 
+        // Might do Questionable Things because we are using our currentAcceleration which may not be accurate (Why it is in the untested Portion) 
 
         Translation2d curAccel = swerveSubsystem.getState().accelerationXY();
-        Translation2d desiredJerk = desiredAcceleration.minus(curAccel);
+        Translation2d desiredJerk = desiredAcceleration.minus(curAccel).div(deltaSeconds);
         double jerkLimit = SwerveConstants.MAX_JERK.in(MetersPerSecondPerSecond.per(Seconds));
         
         double jerkScaling = Math.min(jerkLimit, desiredJerk.getNorm());
 
         Translation2d scaledJerk = desiredJerk.div(desiredJerk.getNorm()).times(jerkScaling);
 
-        desiredAcceleration = curAccel.plus(scaledJerk);
+        desiredAcceleration = curAccel.plus(scaledJerk.times(deltaSeconds));
         
-        /** Jerk Limiting End */
+        // Jerk Limiting End 
 
-        desiredTranslation = curVel.plus(desiredAcceleration);
+        desiredTranslation = curVel.plus(desiredAcceleration.times(deltaSeconds));
+
+        lastPeriodicSeconds = Timer.getFPGATimestamp();
         /* Untested Portion End */
 
         swerveSubsystem.Drive(desiredTranslation, desiredRotation, fieldRelative, openLoop);
+
     }
 }
