@@ -80,25 +80,25 @@ public final class SwerveConfigs {
                 drive.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
                 /** Individual Swerve Module Configurations */ 
-                FRONT_LEFT.CANcoderId = 0;  
+                FRONT_LEFT.EncoderId = 0;  
                 FRONT_LEFT.DriveMotorId = 3; 
                 FRONT_LEFT.SteerMotorId = 6;
-                FRONT_LEFT.CANcoderOffset = -0.313;
+                FRONT_LEFT.EncoderOffset = -0.313;
         
-                FRONT_RIGHT.CANcoderId = 3; 
+                FRONT_RIGHT.EncoderId = 3; 
                 FRONT_RIGHT.DriveMotorId = 4;
                 FRONT_RIGHT.SteerMotorId = 7;
-                FRONT_RIGHT.CANcoderOffset = 0.272;
+                FRONT_RIGHT.EncoderOffset = 0.272;
 
-                BACK_LEFT.CANcoderId = 2; 
+                BACK_LEFT.EncoderId = 2; 
                 BACK_LEFT.DriveMotorId = 2;
                 BACK_LEFT.SteerMotorId = 1;
-                BACK_LEFT.CANcoderOffset = 0.372;
-
-                BACK_RIGHT.CANcoderId = 1; 
+                BACK_LEFT.EncoderOffset = 0.372;
+                
+                BACK_RIGHT.EncoderId = 1; 
                 BACK_RIGHT.DriveMotorId = 5;
                 BACK_RIGHT.SteerMotorId = 0;
-                BACK_RIGHT.CANcoderOffset = 0.359;
+                BACK_RIGHT.EncoderOffset = 0.359;
 
                 /** Pigeon Configuration */ 
                 pigeon.MountPose.MountPoseYaw = 0;

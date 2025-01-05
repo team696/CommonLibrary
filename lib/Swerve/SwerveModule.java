@@ -58,9 +58,9 @@ public class SwerveModule{
 
     public SwerveModule(SwerveModuleConstants moduleConstants){
         this.moduleNumber = s_moduleCount++;
-        this._angleOffset = Rotation2d.fromRotations(moduleConstants.CANcoderOffset); 
+        this._angleOffset = Rotation2d.fromRotations(moduleConstants.EncoderOffset); 
         /* Angle Encoder Config */
-        _encoder = new CANCoderFactory(moduleConstants.CANcoderId, SwerveConstants.canBus, SwerveConfigs.canCoder, "Swerve Encoder " + moduleNumber);
+        _encoder = new CANCoderFactory(moduleConstants.EncoderId, SwerveConstants.canBus, SwerveConfigs.canCoder, "Swerve Encoder " + moduleNumber);
 
         _encoderSignal = ( _encoder.get().getAbsolutePosition()); 
 
