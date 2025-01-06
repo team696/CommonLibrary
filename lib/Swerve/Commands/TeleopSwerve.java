@@ -122,8 +122,8 @@ public class TeleopSwerve extends Command {
         double desiredRotation = rAxis * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RotationsPerSecond);
         Translation2d desiredTranslation = new Translation2d(Math.pow(magnitude, 2), theta).times(SwerveConstants.MAX_VELOCITY.in(MetersPerSecond)).times(outputPercent);
 
-        /* Untested Portion Begin 
-        double deltaSeconds = Timer.getFPGATimestamp() - lastPeriodicSeconds;
+        // Untested Portion Begin 
+        /*double deltaSeconds = Timer.getFPGATimestamp() - lastPeriodicSeconds;
 
         // Acceleration Limiting Start 
         Translation2d curVel = swerveSubsystem.getState().velocityXY();
