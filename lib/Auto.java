@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -77,7 +78,6 @@ public class Auto {
 
     private Auto (SwerveDriveSubsystem swerve, boolean shouldUseGUIValues, NamedCommand... commandsToRegister) {
         _swerve = swerve;
-        
         RobotConfig config = new RobotConfig(
             SwerveConstants.MASS, 
             SwerveConstants.MOMENT_OF_INERTIA, 
@@ -145,7 +145,8 @@ public class Auto {
             new SysIdRoutine.Config(
                 Volts.per(Second).of(1), 
                 Volts.of(3), 
-                Seconds.of(10)), 
+                Seconds.of(5),
+                (state)->BackupLogger.addToQueue("state", state.toString())), 
             new SysIdRoutine.Mechanism(_swerve::voltageDriveForward, log -> {
                 for (int i = 0; i < SwerveModule.s_moduleCount; i++) {
                     log.motor(SwerveModule.moduleNames[i])

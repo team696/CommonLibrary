@@ -68,7 +68,7 @@ public final class SwerveConfigs {
                 drive.CurrentLimits.SupplyCurrentLowerLimit = 90;
                 drive.CurrentLimits.SupplyCurrentLowerTime = 0.2;
                 drive.CurrentLimits.StatorCurrentLimitEnable = true;
-                drive.CurrentLimits.StatorCurrentLimit = 110;
+                drive.CurrentLimits.StatorCurrentLimit = 110;   
                 drive.Voltage.PeakForwardVoltage = 12.;
                 drive.Voltage.PeakReverseVoltage = -12.;
 
@@ -84,23 +84,22 @@ public final class SwerveConfigs {
                 FRONT_LEFT.EncoderId = 0;  
                 FRONT_LEFT.DriveMotorId = 3; 
                 FRONT_LEFT.SteerMotorId = 6;
-                FRONT_LEFT.EncoderOffset = 0.188;
+                FRONT_LEFT.EncoderOffset = 0.178-0.5;
         
                 FRONT_RIGHT.EncoderId = 3; 
                 FRONT_RIGHT.DriveMotorId = 4;
                 FRONT_RIGHT.SteerMotorId = 7;
-                FRONT_RIGHT.EncoderOffset = -0.208;
+                FRONT_RIGHT.EncoderOffset = -0.248+0.5;
 
                 BACK_LEFT.EncoderId = 2; 
                 BACK_LEFT.DriveMotorId = 2;
                 BACK_LEFT.SteerMotorId = 1;
-                BACK_LEFT.EncoderOffset = -0.131;
+                BACK_LEFT.EncoderOffset = -0.127+0.5;
 
                 BACK_RIGHT.EncoderId = 1; 
                 BACK_RIGHT.DriveMotorId = 5;
                 BACK_RIGHT.SteerMotorId = 0;
-                BACK_RIGHT.EncoderOffset = -0.146;
-
+                BACK_RIGHT.EncoderOffset = -0.138+0.5;
                 /** Pigeon Configuration */ 
                 pigeon.MountPose.MountPoseYaw = 0;
         }
