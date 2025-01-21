@@ -139,7 +139,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
      * @see latencyAdjustedYaw()
      */
     public Rotation2d getYaw() {
-        return _pigeon.getYaw();
+        return _pigeon.getYaw().times(-1);
     }
 
     /**
@@ -147,7 +147,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
      * @return Latency Adjusted Yaw Of the Gyro
      */
     public Rotation2d latencyAdjustedYaw() {
-        return _pigeon.getLatencyAdjustedYaw();
+        return _pigeon.getLatencyAdjustedYaw().times(-1);
     }
 
     /**
@@ -395,7 +395,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
                     double timeSinceLastUpdate = time - _cachedState.timeStamp;
                     if (timeSinceLastUpdate == 0) timeSinceLastUpdate = 1e-9;
 
-                    Pose2d newPose = _poseEstimator.update(latencyAdjustedYaw(), _swervePositions);
+                    Pose2d newPose = _poseEstimator.update(latencyAdjustedYaw().times(-1), _swervePositions);
 
                     double slippage = Math.abs(speeds.omegaRadiansPerSecond - _pigeon.getAngularVelocity().in(RadiansPerSecond)) * Math.sqrt(speeds.vxMetersPerSecond * speeds.vxMetersPerSecond + speeds.vyMetersPerSecond * speeds.vyMetersPerSecond);
 

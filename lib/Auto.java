@@ -145,8 +145,8 @@ public class Auto {
             new SysIdRoutine.Config(
                 Volts.per(Second).of(1), 
                 Volts.of(3), 
-                Seconds.of(5),
-                (state)->BackupLogger.addToQueue("state", state.toString())), 
+                Seconds.of(6),
+                (state)->{BackupLogger.addToQueue("state", state.toString());SignalLogger.writeString("State", state.toString());}), 
             new SysIdRoutine.Mechanism(_swerve::voltageDriveForward, log -> {
                 for (int i = 0; i < SwerveModule.s_moduleCount; i++) {
                     log.motor(SwerveModule.moduleNames[i])
