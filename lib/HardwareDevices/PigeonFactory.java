@@ -138,6 +138,6 @@ public class PigeonFactory implements GyroInterface {
     }
 
     public Rotation2d getLatencyAdjustedYaw() {
-        return Rotation2d.fromDegrees(MathUtil.inputModulus(BaseStatusSignal.getLatencyCompensatedValue(_yawSignal, _yawVelocitySignal).baseUnitMagnitude(),-180,180));
+        return Rotation2d.fromDegrees(MathUtil.inputModulus(BaseStatusSignal.getLatencyCompensatedValue(_yawSignal, _yawVelocitySignal).magnitude(),-180,180));
     }
 }

@@ -2,6 +2,7 @@ package frc.team696.lib.Swerve.Commands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -106,7 +107,9 @@ public class TeleopSwerve extends Command {
         double xAxis = strafe.getAsDouble();
         double rAxis = rotation.getAsDouble();
 
-        Rotation2d theta = new Rotation2d(yAxis, xAxis);
+        Rotation2d theta=Rotation2d.fromDegrees(0);
+        if(xAxis!=0||yAxis!=0)
+             theta = new Rotation2d(yAxis, xAxis);
         double magnitude = Math.min(Math.sqrt((xAxis * xAxis) + (yAxis * yAxis)), 1);
         if (magnitude < deadband) magnitude = 0;
         Rotation2d goalRotation = rotationGoal.get();
@@ -119,7 +122,7 @@ public class TeleopSwerve extends Command {
 
         double outputPercent = Math.min(multiplier.getAsDouble(),1);
 
-        double desiredRotation = rAxis * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RotationsPerSecond);
+        double desiredRotation = rAxis * SwerveConstants.MAX_ANGULAR_VELOCITY.in(RadiansPerSecond);
         Translation2d desiredTranslation = new Translation2d(Math.pow(magnitude, 2), theta).times(SwerveConstants.MAX_VELOCITY.in(MetersPerSecond)).times(outputPercent);
 
         /* Untested Portion Begin 
