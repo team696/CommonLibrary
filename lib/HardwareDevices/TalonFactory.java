@@ -2,6 +2,7 @@ package frc.team696.lib.HardwareDevices;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -44,6 +45,16 @@ public class TalonFactory {
     private Alert configurationAlert;
 
     public TalonFactory(int id, String canBus, TalonFXConfiguration config, String name) {
+        this._motor = new TalonFX(id, canBus);
+        this._name = name;
+        this._config = config;
+        _DutyCycleControl = new DutyCycleOut(0);
+        _VoltageControl = new VoltageOut(0);
+        configurationAlert = new Alert(String.format("Failed to configure %s", this._name), AlertType.kError);
+        configure();
+    }
+
+    public TalonFactory(int id, CANBus canBus, TalonFXConfiguration config, String name) {
         this._motor = new TalonFX(id, canBus);
         this._name = name;
         this._config = config;
@@ -106,6 +117,10 @@ public class TalonFactory {
 
     public int getID() {
         return _motor.getDeviceID();
+    }
+    
+    public String getName(){
+        return _name;
     }
 
     public void setPosition(double newPosition) {

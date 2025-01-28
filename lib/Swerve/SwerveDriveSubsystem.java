@@ -62,7 +62,7 @@ public abstract class SwerveDriveSubsystem extends SubsystemBase {
             _swervePositions[i] = _modules[i].getPosition();
         }
 
-        _pigeon = new PigeonFactory(0, SwerveConfigs.pigeon, "Pigeon");
+        _pigeon = new PigeonFactory(0, SwerveConstants.canBus,SwerveConfigs.pigeon, "Pigeon");
 
         _poseEstimator = new SwerveDrivePoseEstimator(_kinematics, getYaw(), _swervePositions, new Pose2d(0,0,new Rotation2d(0)), VecBuilder.fill(0.1, 0.1, 0.01), VecBuilder.fill(0.3, 0.3, 0.6)); 
     

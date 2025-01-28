@@ -42,7 +42,7 @@ import edu.wpi.first.units.measure.Voltage;
  * <p> Should Be Updated For Each Robot Accordingly
  */
 public class SwerveConstants {
-		public static final String canBus = "rio";
+		public static final String canBus = "cv";
 
 		public static final int expectedModuleCount = 4;
 
@@ -56,10 +56,10 @@ public class SwerveConstants {
 		public static final Mass MASS = Pounds.of(140);
 
 		// Distance From The Center To The Wheel, From The Distance Between Two Wheels divided By 2
-		public static final Distance WHEELBASE_X = Inches.of(13.0).div(2);
-		public static final Distance WHEELBASE_Y = Inches.of(13.0).div(2);
+		public static final Distance WHEELBASE_X = Inches.of(18.5).div(2);
+		public static final Distance WHEELBASE_Y = Inches.of(18.5).div(2);
 		public static final Distance DRIVEBASE_RADIUS = Inches.of(Math.sqrt(Math.pow(WHEELBASE_X.in(Inches), 2) + Math.pow(WHEELBASE_Y.in(Inches), 2)));
-		public static final Distance WHEEL_DIAMETER = Inches.of(3.94);
+		public static final Distance WHEEL_DIAMETER = Inches.of(3.5);
 		public static final Distance WHEEL_RADIUS = WHEEL_DIAMETER.div(2);
 		public static final Distance WHEEL_CIRCUM = WHEEL_DIAMETER.times(Math.PI);
 		public static final double WHEEL_COEFFICIENT_OF_FRICTION = 1.2;

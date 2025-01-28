@@ -19,20 +19,20 @@ public final class SwerveConfigs {
         public final static TalonFXConfiguration drive;
         public final static CANcoderConfiguration canCoder;
         public final static Pigeon2Configuration pigeon;
-        public final static SwerveModuleConstants FRONT_LEFT;
-        public final static SwerveModuleConstants FRONT_RIGHT;
-        public final static SwerveModuleConstants BACK_LEFT;
-        public final static SwerveModuleConstants BACK_RIGHT;
+        public final static SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FRONT_LEFT;
+        public final static SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FRONT_RIGHT;
+        public final static SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> BACK_LEFT;
+        public final static SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> BACK_RIGHT;
         static {
                 angle = new TalonFXConfiguration();
                 drive = new TalonFXConfiguration();
                 canCoder = new CANcoderConfiguration();  
                 pigeon = new Pigeon2Configuration();
 
-                FRONT_LEFT = new SwerveModuleConstants();
-                FRONT_RIGHT = new SwerveModuleConstants();
-                BACK_LEFT = new SwerveModuleConstants();
-                BACK_RIGHT = new SwerveModuleConstants();
+                FRONT_LEFT = new SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>();
+                FRONT_RIGHT = new SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>();
+                BACK_LEFT = new SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>();
+                BACK_RIGHT = new SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>();
                 
                 /** Swerve CANCoder Configuration */
                 canCoder.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
@@ -81,24 +81,25 @@ public final class SwerveConfigs {
 
                 /** Individual Swerve Module Configurations */ 
                 FRONT_LEFT.EncoderId = 0;  
-                FRONT_LEFT.DriveMotorId = 3; 
-                FRONT_LEFT.SteerMotorId = 6;
-                FRONT_LEFT.EncoderOffset = -0.313;
+                FRONT_LEFT.DriveMotorId = 1; 
+                FRONT_LEFT.SteerMotorId = 0;
+                FRONT_LEFT.EncoderOffset = -0.24-.25;
         
-                FRONT_RIGHT.EncoderId = 3; 
-                FRONT_RIGHT.DriveMotorId = 4;
-                FRONT_RIGHT.SteerMotorId = 7;
-                FRONT_RIGHT.EncoderOffset = 0.272;
+                FRONT_RIGHT.EncoderId = 1; 
+                FRONT_RIGHT.DriveMotorId = 3;
+                FRONT_RIGHT.SteerMotorId = 2;
+                FRONT_RIGHT.EncoderOffset = -0.393-.25;
 
                 BACK_LEFT.EncoderId = 2; 
-                BACK_LEFT.DriveMotorId = 2;
-                BACK_LEFT.SteerMotorId = 1;
-                BACK_LEFT.EncoderOffset = 0.372;
+                BACK_LEFT.DriveMotorId = 5;
+                BACK_LEFT.SteerMotorId = 4;
+          
+                BACK_LEFT.EncoderOffset = -0.456-.25;
                 
-                BACK_RIGHT.EncoderId = 1; 
-                BACK_RIGHT.DriveMotorId = 5;
-                BACK_RIGHT.SteerMotorId = 0;
-                BACK_RIGHT.EncoderOffset = 0.359;
+                BACK_RIGHT.EncoderId = 3; 
+                BACK_RIGHT.DriveMotorId = 7;
+                BACK_RIGHT.SteerMotorId = 6;
+                BACK_RIGHT.EncoderOffset = -0.03-.25;
 
                 /** Pigeon Configuration */ 
                 pigeon.MountPose.MountPoseYaw = 0;
