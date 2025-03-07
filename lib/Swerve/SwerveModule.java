@@ -7,6 +7,8 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.ParentDevice;
@@ -56,7 +58,7 @@ public class SwerveModule{
     private final double[] _sysidRotationPositions = new double[] {135, -135, -45, 45};
 
 
-    public SwerveModule(SwerveModuleConstants moduleConstants){
+    public SwerveModule(SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> moduleConstants){
         this.moduleNumber = s_moduleCount++;
         this._angleOffset = Rotation2d.fromRotations(moduleConstants.EncoderOffset); 
         /* Angle Encoder Config */
