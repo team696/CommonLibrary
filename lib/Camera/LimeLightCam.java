@@ -64,7 +64,6 @@ public class LimeLightCam extends BaseCam {
         return -1 * _ntTable.getEntry("tx").getDouble(0);
     }
 
-    /* Used with MegaTag2, don't know how that thing works tho */
     public void SetRobotOrientation(Rotation2d curYaw) {
         LimelightHelpers.SetRobotOrientation(name, curYaw.getDegrees(),0,0,0,0,0);
     }
