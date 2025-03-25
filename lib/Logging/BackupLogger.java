@@ -43,10 +43,10 @@ public class BackupLogger {
   private static logThread lThread;
 
   static {
-    DataLogManager.start();
+    DataLogManager.start("/U/logs");
 
     log = DataLogManager.getLog();
-
+    
     DataLogManager.logConsoleOutput(true);
     DataLogManager.logNetworkTables(true);
     DriverStation.startDataLog(log, true);

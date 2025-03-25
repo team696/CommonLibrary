@@ -5,9 +5,11 @@ import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -180,5 +182,27 @@ public class Util {
             }		
         }     
         return 0;
+    }
+    public static <K, V, R> Map<K, R> transformMap(Map<K, V> originalMap, Function<V, R> transformer) {
+        Map<K, R> resultMap = new HashMap<>();
+        for (Map.Entry<K, V> entry : originalMap.entrySet()) {
+            resultMap.put(entry.getKey(), transformer.apply(entry.getValue()));
+        }
+        return resultMap;
+    }
+    
+    public static <K, K2, V, R> Map<K, Map<K2, R>> transformNestedMap(
+            Map<K, Map<K2, V>> originalMap, Function<V, R> transformer) {
+        Map<K, Map<K2, R>> resultMap = new HashMap<>();
+        
+        for (Map.Entry<K, Map<K2, V>> outerEntry : originalMap.entrySet()) {
+            Map<K2, R> innerResultMap = new HashMap<>();
+            for (Map.Entry<K2, V> innerEntry : outerEntry.getValue().entrySet()) {
+                innerResultMap.put(innerEntry.getKey(), transformer.apply(innerEntry.getValue()));
+            }
+            resultMap.put(outerEntry.getKey(), innerResultMap);
+        }
+        
+        return resultMap;
     }
 }
